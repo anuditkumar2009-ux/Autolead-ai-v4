@@ -10,7 +10,6 @@ const { parse } = require("csv-parse/sync");
 const { body, validationResult } = require("express-validator");
 const { Pool } = require("pg");
 const { GoogleGenAI } = require("@google/genai");
-const { Resend } = require("resend");
 require("dotenv").config();
 
 const app = express();
@@ -23,7 +22,7 @@ app.use(
     origin: process.env.FRONTEND_ORIGIN
       ? process.env.FRONTEND_ORIGIN.split(",").map((x) => x.trim())
       : true,
-  })
+  }),
 );
 
 app.use(express.json({ limit: "1mb" }));
@@ -35,7 +34,7 @@ app.use(
     limit: Number(process.env.RATE_LIMIT_MAX) || 100,
     standardHeaders: "draft-8",
     legacyHeaders: false,
-  })
+  }),
 );
 
 const upload = multer({
@@ -51,16 +50,26 @@ const pool = new Pool({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
 const GEMINI_MODEL =
   process.env.GEMINI_MODEL || "gemini-3-flash-preview";
 
 const TRIAL_DAYS = Number(process.env.TRIAL_DAYS) || 7;
 const TRIAL_LEADS = Number(process.env.TRIAL_LEADS) || 10;
 
+const RESET_MINUTES = 30;
+
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ||
+  process.env.FRONTEND_ORIGIN ||
+  "";
+
 if (!JWT_SECRET) {
   console.error("FATAL: JWT_SECRET missing");
   process.exit(1);
 }
+
+/* -------------------- HELPERS -------------------- */
 
 function validate(req, res, next) {
   const errors = validationResult(req);
@@ -84,13 +93,13 @@ function tokenFor(user) {
     JWT_SECRET,
     {
       expiresIn: "7d",
-    }
+    },
   );
 }
 
 function auth(req, res, next) {
   const [scheme, token] = String(
-    req.headers.authorization || ""
+    req.headers.authorization || "",
   ).split(" ");
 
   if (scheme !== "Bearer" || !token) {
@@ -119,11 +128,25 @@ function expired(trial) {
   );
 }
 
-/* =========================
-   DATABASE INITIALIZATION
-========================= */
+function hashResetToken(token) {
+  return crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+}
 
-async function initDatabase() {
+function htmlEscape(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/* -------------------- DATABASE INIT -------------------- */
+
+async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id BIGSERIAL PRIMARY KEY,
@@ -134,32 +157,53 @@ async function initDatabase() {
     );
 
     CREATE TABLE IF NOT EXISTS agent_trials (
-      agent_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      agent_id BIGINT PRIMARY KEY
+        REFERENCES users(id) ON DELETE CASCADE,
       trial_start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      leads_processed_count INTEGER NOT NULL DEFAULT 0
-        CHECK (leads_processed_count >= 0),
+      leads_processed_count INTEGER NOT NULL DEFAULT 0,
       is_active BOOLEAN NOT NULL DEFAULT TRUE
     );
 
     CREATE TABLE IF NOT EXISTS leads (
       id BIGSERIAL PRIMARY KEY,
-      agent_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      name VARCHAR(150) NOT NULL,
-      phone VARCHAR(30),
+      agent_id BIGINT NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+      name VARCHAR(200) NOT NULL,
+      phone VARCHAR(50),
       email VARCHAR(254),
-      location VARCHAR(150),
-      property_requirement VARCHAR(200),
-      budget VARCHAR(100),
+      location VARCHAR(200),
+      property_requirement VARCHAR(300),
+      budget VARCHAR(200),
       buyer_segment VARCHAR(100),
-      source VARCHAR(150) NOT NULL,
-      verification_status VARCHAR(30)
+      source VARCHAR(500),
+      verification_status VARCHAR(100)
         NOT NULL DEFAULT 'Needs Verification',
-      last_verified_date DATE,
-      lead_score INTEGER
-        CHECK (lead_score IS NULL OR lead_score BETWEEN 0 AND 100),
-      lead_temperature VARCHAR(10),
-      lead_status VARCHAR(30) NOT NULL DEFAULT 'New',
+      last_verified_date TIMESTAMPTZ,
+      lead_score INTEGER,
+      lead_temperature VARCHAR(20),
+      lead_status VARCHAR(50) NOT NULL DEFAULT 'New',
       notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS lead_activities (
+      id BIGSERIAL PRIMARY KEY,
+      lead_id BIGINT NOT NULL
+        REFERENCES leads(id) ON DELETE CASCADE,
+      agent_id BIGINT NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+      activity_type VARCHAR(100) NOT NULL,
+      details TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id BIGSERIAL PRIMARY KEY,
+      user_id BIGINT NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+      token_hash VARCHAR(64) UNIQUE NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
@@ -169,37 +213,15 @@ async function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_leads_agent_status
       ON leads(agent_id, lead_status);
 
-    CREATE TABLE IF NOT EXISTS lead_activities (
-      id BIGSERIAL PRIMARY KEY,
-      lead_id BIGINT NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
-      agent_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      activity_type VARCHAR(50) NOT NULL,
-      details TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS password_reset_tokens (
-      id BIGSERIAL PRIMARY KEY,
-      user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      token_hash VARCHAR(64) NOT NULL UNIQUE,
-      expires_at TIMESTAMPTZ NOT NULL,
-      used_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_password_reset_user
+    CREATE INDEX IF NOT EXISTS idx_reset_tokens_user
       ON password_reset_tokens(user_id);
 
-    CREATE INDEX IF NOT EXISTS idx_password_reset_expiry
+    CREATE INDEX IF NOT EXISTS idx_reset_tokens_expiry
       ON password_reset_tokens(expires_at);
   `);
-
-  console.log("Database initialized successfully");
 }
 
-/* =========================
-   HEALTH
-========================= */
+/* -------------------- HEALTH -------------------- */
 
 app.get("/api/health", async (req, res) => {
   try {
@@ -209,7 +231,11 @@ app.get("/api/health", async (req, res) => {
       status: "healthy",
       database: "connected",
       ai: Boolean(process.env.GEMINI_API_KEY),
-      email: Boolean(process.env.RESEND_API_KEY),
+      email: Boolean(
+        process.env.RESEND_API_KEY &&
+        process.env.MAIL_FROM &&
+        FRONTEND_URL
+      ),
       model: GEMINI_MODEL,
     });
   } catch {
@@ -222,9 +248,7 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-/* =========================
-   SIGNUP
-========================= */
+/* -------------------- SIGNUP -------------------- */
 
 app.post(
   "/api/auth/signup",
@@ -250,7 +274,7 @@ app.post(
 
       const passwordHash = await bcrypt.hash(
         req.body.password,
-        12
+        12,
       );
 
       const result = await client.query(
@@ -265,7 +289,7 @@ app.post(
           req.body.name,
           req.body.email,
           passwordHash,
-        ]
+        ],
       );
 
       const user = result.rows[0];
@@ -275,7 +299,7 @@ app.post(
         INSERT INTO agent_trials (agent_id)
         VALUES ($1)
         `,
-        [user.id]
+        [user.id],
       );
 
       await client.query("COMMIT");
@@ -293,7 +317,7 @@ app.post(
         });
       }
 
-      console.error("SIGNUP ERROR:", error);
+      console.error("SIGNUP ERROR", error);
 
       res.status(500).json({
         error: "Signup failed",
@@ -301,12 +325,10 @@ app.post(
     } finally {
       client.release();
     }
-  }
+  },
 );
 
-/* =========================
-   LOGIN
-========================= */
+/* -------------------- LOGIN -------------------- */
 
 app.post(
   "/api/auth/login",
@@ -324,15 +346,11 @@ app.post(
     try {
       const result = await pool.query(
         `
-        SELECT
-          id,
-          name,
-          email,
-          password_hash
+        SELECT id, name, email, password_hash
         FROM users
         WHERE email = $1
         `,
-        [req.body.email]
+        [req.body.email],
       );
 
       const user = result.rows[0];
@@ -341,7 +359,7 @@ app.post(
         !user ||
         !(await bcrypt.compare(
           req.body.password,
-          user.password_hash
+          user.password_hash,
         ))
       ) {
         return res.status(401).json({
@@ -358,18 +376,16 @@ app.post(
         },
       });
     } catch (error) {
-      console.error("LOGIN ERROR:", error);
+      console.error("LOGIN ERROR", error);
 
       res.status(500).json({
         error: "Login failed",
       });
     }
-  }
+  },
 );
 
-/* =========================
-   FORGOT PASSWORD
-========================= */
+/* -------------------- FORGOT PASSWORD -------------------- */
 
 app.post(
   "/api/auth/forgot-password",
@@ -382,58 +398,51 @@ app.post(
   validate,
   async (req, res) => {
     const genericResponse = {
+      success: true,
       message:
-        "If an account exists for this email, a password reset link has been sent.",
+        "If an account exists for that email, a password reset link has been sent.",
     };
+
+    if (
+      !process.env.RESEND_API_KEY ||
+      !process.env.MAIL_FROM ||
+      !FRONTEND_URL
+    ) {
+      return res.status(503).json({
+        error:
+          "Password reset email service is not configured on the server.",
+      });
+    }
 
     try {
       const result = await pool.query(
         `
-        SELECT id, email, name
+        SELECT id, name, email
         FROM users
         WHERE email = $1
         `,
-        [req.body.email]
+        [req.body.email],
       );
 
       const user = result.rows[0];
 
-      /*
-       Never reveal whether an email exists.
-      */
       if (!user) {
         return res.json(genericResponse);
       }
 
-      /*
-       Invalidate previous unused reset tokens
-       for this user.
-      */
+      const rawToken = crypto
+        .randomBytes(32)
+        .toString("hex");
+
+      const tokenHash = hashResetToken(rawToken);
+
       await pool.query(
         `
-        UPDATE password_reset_tokens
-        SET used_at = NOW()
+        DELETE FROM password_reset_tokens
         WHERE user_id = $1
-          AND used_at IS NULL
+           OR expires_at < NOW()
         `,
-        [user.id]
-      );
-
-      /*
-       Generate a cryptographically secure token.
-      */
-      const rawToken = crypto.randomBytes(32).toString("hex");
-
-      const tokenHash = crypto
-        .createHash("sha256")
-        .update(rawToken)
-        .digest("hex");
-
-      /*
-       Token valid for 30 minutes.
-      */
-      const expiresAt = new Date(
-        Date.now() + 30 * 60 * 1000
+        [user.id],
       );
 
       await pool.query(
@@ -441,138 +450,112 @@ app.post(
         INSERT INTO password_reset_tokens
           (user_id, token_hash, expires_at)
         VALUES
-          ($1, $2, $3)
+          (
+            $1,
+            $2,
+            NOW() + $3 * INTERVAL '1 minute'
+          )
         `,
         [
           user.id,
           tokenHash,
-          expiresAt,
-        ]
+          RESET_MINUTES,
+        ],
       );
 
-      const frontendUrl =
-        process.env.FRONTEND_URL ||
-        process.env.FRONTEND_ORIGIN;
+      const resetLink =
+        `${FRONTEND_URL}/?reset_token=` +
+        encodeURIComponent(rawToken);
 
-      if (!frontendUrl) {
-        console.error(
-          "FRONTEND_URL is not configured"
-        );
+      const safeName = htmlEscape(user.name);
 
-        return res.status(503).json({
-          error:
-            "Password reset email service is not configured",
-        });
-      }
+      const emailHtml = `
+        <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:20px">
+          <h2>Reset your AutoLead AI password</h2>
 
-      const resetUrl =
-        `${frontendUrl.replace(/\/$/, "")}` +
-        `/?reset_token=${encodeURIComponent(rawToken)}`;
+          <p>Hello ${safeName},</p>
 
-      /*
-       Do not silently pretend an email was sent
-       if email configuration is missing.
-      */
-      if (!process.env.RESEND_API_KEY) {
-        console.error(
-          "RESEND_API_KEY is not configured"
-        );
+          <p>
+            We received a request to reset your
+            AutoLead AI password.
+          </p>
 
-        return res.status(503).json({
-          error:
-            "Password reset email service is not configured",
-        });
-      }
+          <p>
+            <a
+              href="${resetLink}"
+              style="
+                display:inline-block;
+                background:#2563eb;
+                color:#fff;
+                padding:12px 18px;
+                border-radius:8px;
+                text-decoration:none
+              "
+            >
+              Reset Password
+            </a>
+          </p>
 
-      if (!process.env.MAIL_FROM) {
-        console.error(
-          "MAIL_FROM is not configured"
-        );
+          <p>
+            This link expires in ${RESET_MINUTES} minutes
+            and can be used only once.
+          </p>
 
-        return res.status(503).json({
-          error:
-            "Password reset email sender is not configured",
-        });
-      }
+          <p>
+            If you did not request this, you can safely
+            ignore this email.
+          </p>
+        </div>
+      `;
 
-      const resend = new Resend(
-        process.env.RESEND_API_KEY
+      const response = await fetch(
+        "https://api.resend.com/emails",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              `Bearer ${process.env.RESEND_API_KEY}`,
+          },
+
+          body: JSON.stringify({
+            from: process.env.MAIL_FROM,
+            to: [user.email],
+            subject:
+              "Reset your AutoLead AI password",
+            html: emailHtml,
+          }),
+        },
       );
 
-      const emailResult = await resend.emails.send({
-        from: process.env.MAIL_FROM,
-        to: [user.email],
-        subject: "Reset your AutoLead AI password",
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
-            <h2>AutoLead AI</h2>
+      if (!response.ok) {
+        const details = await response.text();
 
-            <p>Hello ${String(user.name)
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")},</p>
-
-            <p>
-              We received a request to reset your
-              AutoLead AI password.
-            </p>
-
-            <p>
-              <a
-                href="${resetUrl}"
-                style="
-                  display:inline-block;
-                  background:#2563eb;
-                  color:white;
-                  padding:12px 18px;
-                  border-radius:8px;
-                  text-decoration:none;
-                  font-weight:bold
-                "
-              >
-                Reset Password
-              </a>
-            </p>
-
-            <p>
-              This link will expire in 30 minutes
-              and can only be used once.
-            </p>
-
-            <p>
-              If you did not request this, you can
-              safely ignore this email.
-            </p>
-
-            <p>
-              AutoLead AI
-            </p>
-          </div>
-        `,
-      });
-
-      if (emailResult?.error) {
         console.error(
-          "PASSWORD RESET EMAIL ERROR:",
-          emailResult.error
+          "RESEND ERROR",
+          details,
+        );
+
+        await pool.query(
+          `
+          DELETE FROM password_reset_tokens
+          WHERE token_hash = $1
+          `,
+          [tokenHash],
         );
 
         return res.status(502).json({
           error:
-            "Password reset email could not be sent",
+            "Password reset email could not be sent. Check the email service configuration.",
         });
       }
-
-      console.log(
-        "Password reset email sent:",
-        user.email
-      );
 
       return res.json(genericResponse);
     } catch (error) {
       console.error(
-        "FORGOT PASSWORD ERROR:",
-        error
+        "FORGOT PASSWORD ERROR",
+        error,
       );
 
       res.status(500).json({
@@ -580,47 +563,47 @@ app.post(
           "Password reset request failed",
       });
     }
-  }
+  },
 );
 
-/* =========================
-   RESET PASSWORD
-========================= */
+/* -------------------- RESET PASSWORD -------------------- */
 
 app.post(
   "/api/auth/reset-password",
   [
     body("token")
-      .isString()
-      .isLength({ min: 64, max: 64 }),
+      .isHexadecimal()
+      .isLength({
+        min: 64,
+        max: 64,
+      }),
 
     body("password")
-      .isLength({ min: 8, max: 128 }),
+      .isLength({
+        min: 8,
+        max: 128,
+      }),
   ],
   validate,
   async (req, res) => {
     const client = await pool.connect();
 
     try {
-      const tokenHash = crypto
-        .createHash("sha256")
-        .update(req.body.token)
-        .digest("hex");
+      const tokenHash =
+        hashResetToken(req.body.token);
 
       await client.query("BEGIN");
 
       const result = await client.query(
         `
-        SELECT
-          id,
-          user_id,
-          expires_at
+        SELECT id, user_id
         FROM password_reset_tokens
         WHERE token_hash = $1
           AND used_at IS NULL
+          AND expires_at > NOW()
         FOR UPDATE
         `,
-        [tokenHash]
+        [tokenHash],
       );
 
       const resetToken = result.rows[0];
@@ -630,26 +613,15 @@ app.post(
 
         return res.status(400).json({
           error:
-            "Invalid or already used reset link",
+            "This reset link is invalid or expired.",
         });
       }
 
-      if (
-        new Date(resetToken.expires_at).getTime() <=
-        Date.now()
-      ) {
-        await client.query("ROLLBACK");
-
-        return res.status(400).json({
-          error:
-            "This reset link has expired",
-        });
-      }
-
-      const passwordHash = await bcrypt.hash(
-        req.body.password,
-        12
-      );
+      const passwordHash =
+        await bcrypt.hash(
+          req.body.password,
+          12,
+        );
 
       await client.query(
         `
@@ -660,33 +632,30 @@ app.post(
         [
           passwordHash,
           resetToken.user_id,
-        ]
+        ],
       );
 
-      /*
-       Mark token as used immediately.
-      */
       await client.query(
         `
         UPDATE password_reset_tokens
         SET used_at = NOW()
         WHERE id = $1
         `,
-        [resetToken.id]
+        [resetToken.id],
       );
 
-      /*
-       Invalidate any other unused tokens
-       belonging to the same user.
-      */
       await client.query(
         `
         UPDATE password_reset_tokens
         SET used_at = NOW()
         WHERE user_id = $1
           AND used_at IS NULL
+          AND id <> $2
         `,
-        [resetToken.user_id]
+        [
+          resetToken.user_id,
+          resetToken.id,
+        ],
       );
 
       await client.query("COMMIT");
@@ -694,29 +663,27 @@ app.post(
       res.json({
         success: true,
         message:
-          "Password updated successfully. You can now log in.",
+          "Password reset successful. You can now log in.",
       });
     } catch (error) {
       await client.query("ROLLBACK");
 
       console.error(
-        "RESET PASSWORD ERROR:",
-        error
+        "RESET PASSWORD ERROR",
+        error,
       );
 
       res.status(500).json({
         error:
-          "Password could not be reset",
+          "Password reset failed",
       });
     } finally {
       client.release();
     }
-  }
+  },
 );
 
-/* =========================
-   TRIAL
-========================= */
+/* -------------------- TRIAL -------------------- */
 
 app.get(
   "/api/trial",
@@ -729,7 +696,7 @@ app.get(
         FROM agent_trials
         WHERE agent_id = $1
         `,
-        [req.user.id]
+        [req.user.id],
       );
 
       const trial = result.rows[0];
@@ -740,15 +707,18 @@ app.get(
         });
       }
 
-      const days = Math.max(
-        0,
-        TRIAL_DAYS -
-          (Date.now() -
-            new Date(
-              trial.trial_start_date
-            ).getTime()) /
-            86400000
-      );
+      const days =
+        Math.max(
+          0,
+          TRIAL_DAYS -
+            (
+              Date.now() -
+              new Date(
+                trial.trial_start_date,
+              ).getTime()
+            ) /
+              86400000,
+        );
 
       res.json({
         active:
@@ -762,28 +732,32 @@ app.get(
         leadsUsed:
           trial.leads_processed_count,
 
-        leadsRemaining: Math.max(
-          0,
-          TRIAL_LEADS -
-            trial.leads_processed_count
-        ),
+        leadsRemaining:
+          Math.max(
+            0,
+            TRIAL_LEADS -
+              trial.leads_processed_count,
+          ),
 
         limits: {
           days: TRIAL_DAYS,
           leads: TRIAL_LEADS,
         },
       });
-    } catch {
+    } catch (error) {
+      console.error(
+        "TRIAL ERROR",
+        error,
+      );
+
       res.status(500).json({
         error: "Failed to read trial",
       });
     }
-  }
+  },
 );
 
-/* =========================
-   LEADS
-========================= */
+/* -------------------- GET LEADS -------------------- */
 
 app.get(
   "/api/leads",
@@ -797,21 +771,24 @@ app.get(
         WHERE agent_id = $1
         ORDER BY created_at DESC
         `,
-        [req.user.id]
+        [req.user.id],
       );
 
       res.json(result.rows);
-    } catch {
+    } catch (error) {
+      console.error(
+        "GET LEADS ERROR",
+        error,
+      );
+
       res.status(500).json({
         error: "Failed to fetch leads",
       });
     }
-  }
+  },
 );
 
-/* =========================
-   CSV IMPORT
-========================= */
+/* -------------------- IMPORT CSV -------------------- */
 
 app.post(
   "/api/leads/import",
@@ -837,10 +814,11 @@ app.post(
           WHERE agent_id = $1
           FOR UPDATE
           `,
-          [req.user.id]
+          [req.user.id],
         );
 
-      const trial = trialResult.rows[0];
+      const trial =
+        trialResult.rows[0];
 
       if (!trial || expired(trial)) {
         await client.query("ROLLBACK");
@@ -858,7 +836,7 @@ app.post(
           bom: true,
           relax_column_count: true,
           trim: true,
-        }
+        },
       );
 
       const remaining =
@@ -870,22 +848,26 @@ app.post(
       let invalid = 0;
 
       for (
-        const row of rows.slice(0, remaining)
+        const row of rows.slice(
+          0,
+          remaining,
+        )
       ) {
         const pick = (...keys) => {
           for (const key of keys) {
-            const field = Object.keys(row).find(
-              (x) =>
-                x.trim().toLowerCase() ===
-                key
-            );
+            const field =
+              Object.keys(row).find(
+                (x) =>
+                  x.trim().toLowerCase() ===
+                  key,
+              );
 
             if (
               field &&
               String(row[field]).trim()
             ) {
               return String(
-                row[field]
+                row[field],
               ).trim();
             }
           }
@@ -897,42 +879,45 @@ app.post(
           "name",
           "full name",
           "prospect",
-          "buyer"
+          "buyer",
         );
 
         const phone = pick(
           "phone",
           "mobile",
-          "contact"
+          "contact",
         );
 
         const email = pick(
           "email",
-          "email address"
+          "email address",
         );
 
         const location = pick(
           "city",
-          "location"
+          "location",
         );
 
         const requirement = pick(
           "property",
           "property type",
-          "requirement"
+          "requirement",
         );
 
         const budget = pick(
           "budget",
-          "budget range"
+          "budget range",
         );
 
         const segment = pick(
           "segment",
-          "buyer segment"
+          "buyer segment",
         );
 
-        if (!name || (!phone && !email)) {
+        if (
+          !name ||
+          (!phone && !email)
+        ) {
           invalid++;
           continue;
         }
@@ -942,4 +927,30 @@ app.post(
             `
             SELECT id
             FROM leads
-            WHERE 
+            WHERE agent_id = $1
+              AND (
+                (
+                  $2 IS NOT NULL
+                  AND $2 <> ''
+                  AND phone = $2
+                )
+                OR
+                (
+                  $3 IS NOT NULL
+                  AND $3 <> ''
+                  AND LOWER(email) =
+                      LOWER($3)
+                )
+              )
+            LIMIT 1
+            `,
+            [
+              req.user.id,
+              phone,
+              email,
+            ],
+          );
+
+        if (duplicate.rows.length) {
+          duplicates++;
+      
