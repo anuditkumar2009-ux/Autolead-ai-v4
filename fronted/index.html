@@ -3,1278 +3,1062 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AutoLead AI</title>
+<title>AutoLead AI | Real Estate</title>
 
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f5f7fb;
-  color:#172033
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:#080d17;color:#f8fafc;line-height:1.5
 }
-button,input,select,textarea{font:inherit}
+button,input,select{font:inherit}
 button{cursor:pointer}
-.hidden{display:none!important}
 
-.topbar{
-  background:#fff;
-  border-bottom:1px solid #e5e7eb;
-  padding:16px 22px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  position:sticky;
-  top:0;
-  z-index:20
+.nav{
+  position:sticky;top:0;z-index:20;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;
+  background:#0d1422;
+  border-bottom:1px solid #1e293b
 }
+.logo{font-weight:800;font-size:17px;color:#38bdf8}
+.badge{
+  font-size:10px;font-weight:700;
+  padding:5px 9px;border-radius:20px;
+  background:#172033;color:#94a3b8;
+  border:1px solid #334155
+}
+.badge.active{color:#34d399;border-color:#047857;background:#052e25}
+.badge.error{color:#f87171;border-color:#991b1b;background:#350b0b}
 
-.logo{
-  font-size:22px;
+.wrap{max-width:900px;margin:auto;padding:18px 14px}
+
+.hero{text-align:center;padding:15px 0 20px}
+.hero h1{font-size:27px}
+.hero h1 span{color:#38bdf8}
+.hero p{color:#94a3b8;font-size:12px;margin-top:6px}
+
+.card{
+  background:#0d1422;
+  border:1px solid #1e293b;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:14px
+}
+.title{
+  color:#38bdf8;
+  font-size:14px;
   font-weight:800;
-  color:#1769e0
+  margin-bottom:12px
 }
 
-.status-badge{
-  padding:7px 12px;
-  border-radius:20px;
-  font-size:13px;
-  background:#fee2e2;
-  color:#991b1b
+input,select{
+  width:100%;
+  background:#080d17;
+  color:#fff;
+  border:1px solid #263449;
+  border-radius:9px;
+  padding:10px;
+  outline:none;
+  font-size:12px
 }
-
-.status-badge.active{
-  background:#dcfce7;
-  color:#166534
-}
-
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:25px 18px
-}
-
-.auth-card{
-  max-width:440px;
-  margin:55px auto;
-  background:#fff;
-  padding:28px;
-  border-radius:18px;
-  box-shadow:0 10px 35px rgba(0,0,0,.08)
-}
-
-h1,h2,h3{margin-top:0}
-
-.subtitle{
-  color:#667085;
-  line-height:1.5
-}
+input:focus,select:focus{border-color:#38bdf8}
 
 label{
   display:block;
-  margin:15px 0 7px;
-  font-weight:600;
-  font-size:14px
-}
-
-input,select,textarea{
-  width:100%;
-  border:1px solid #d8dee9;
-  border-radius:10px;
-  padding:12px;
-  background:#fff;
-  outline:none
-}
-
-input:focus,select:focus,textarea:focus{
-  border-color:#1769e0;
-  box-shadow:0 0 0 3px rgba(23,105,224,.1)
-}
-
-textarea{
-  min-height:100px;
-  resize:vertical
+  color:#cbd5e1;
+  font-size:11px;
+  font-weight:700;
+  margin:10px 0 5px
 }
 
 .btn{
   border:0;
-  border-radius:10px;
-  padding:12px 16px;
-  font-weight:700;
-  background:#1769e0;
-  color:#fff
+  border-radius:9px;
+  padding:10px 13px;
+  color:white;
+  font-size:11px;
+  font-weight:800
 }
+.primary{background:linear-gradient(135deg,#0284c7,#2563eb)}
+.green{background:#059669}
+.red{background:#991b1b}
+.gray{background:#334155}
+.purple{background:#7c3aed}
 
-.btn:hover{opacity:.92}
-.btn:disabled{opacity:.6;cursor:not-allowed}
+.full{width:100%;margin-top:12px}
 
-.btn.secondary{
-  background:#eef3f9;
-  color:#24324a
+.auth{
+  max-width:420px;
+  margin:35px auto
 }
-
-.btn.danger{
-  background:#dc2626;
-  color:#fff
-}
-
-.btn.success{
-  background:#16a34a
-}
-
-.auth-actions{
-  margin-top:20px;
+.auth-tabs{
   display:grid;
-  gap:10px
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-bottom:14px
 }
+.auth-tabs button{padding:9px;border:0;border-radius:8px;background:#172033;color:#94a3b8;font-weight:700}
+.auth-tabs button.active{background:#2563eb;color:#fff}
 
-.link-btn{
-  background:none;
-  border:0;
-  color:#1769e0;
-  padding:5px;
-  font-weight:600
-}
-
-.spinner{
-  display:inline-block;
-  width:15px;
-  height:15px;
-  border:2px solid rgba(255,255,255,.5);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  margin-right:7px;
-  vertical-align:-2px
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
-.dashboard-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-  margin-bottom:20px
-}
+.hidden{display:none!important}
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:20px
+  gap:8px;
+  margin-bottom:14px
 }
-
 .stat{
-  background:#fff;
-  border:1px solid #e8ebf0;
-  border-radius:15px;
-  padding:18px
+  background:#0d1422;
+  border:1px solid #1e293b;
+  border-radius:11px;
+  padding:10px;
+  text-align:center
 }
-
-.stat-title{
-  font-size:13px;
-  color:#667085
-}
-
-.stat-value{
-  font-size:28px;
-  font-weight:800;
-  margin-top:7px
-}
-
-.card{
-  background:#fff;
-  border:1px solid #e8ebf0;
-  border-radius:15px;
-  padding:20px;
-  margin-bottom:18px
-}
-
-.import-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center
-}
-
-.import-row input{
-  flex:1;
-  min-width:220px
-}
-
-.filters{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:10px;
-  margin-bottom:15px
-}
-
-.leads{
-  display:grid;
-  gap:12px
-}
-
-.lead{
-  border:1px solid #e5e7eb;
-  border-radius:13px;
-  padding:16px
-}
-
-.lead-top{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap
-}
-
-.lead-name{
-  font-size:18px;
+.stat b{font-size:19px}
+.stat span{
+  display:block;
+  color:#64748b;
+  font-size:9px;
+  text-transform:uppercase;
   font-weight:800
 }
 
-.meta{
-  color:#667085;
-  font-size:14px;
-  line-height:1.7;
-  margin-top:7px
-}
-
-.tags{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin:10px 0
-}
-
-.tag{
-  background:#eef3f9;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:600
-}
-
-.score{
-  font-weight:800;
-  color:#1769e0
-}
-
-.lead-actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-top:12px
-}
-
-.lead-actions .btn{
-  padding:9px 12px;
-  font-size:13px
-}
-
-.ai-box{
-  margin-top:12px;
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  border-radius:10px;
-  padding:13px;
-  line-height:1.55
-}
-
 .trial{
-  background:#eff6ff;
-  color:#1e40af;
-  padding:10px 13px;
-  border-radius:10px;
-  margin-bottom:18px;
-  font-size:14px
+  font-size:11px;
+  color:#cbd5e1;
+  background:#10203a;
+  border:1px solid #1d4ed8;
+  padding:9px;
+  border-radius:9px;
+  margin-bottom:14px
 }
+
+.tools{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px
+}
+
+.lead{
+  border-top:1px solid #1e293b;
+  padding:13px 0
+}
+.lead:first-child{border-top:0}
+.lead-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+.lead-name{font-weight:800;font-size:13px}
+.meta{font-size:10px;color:#94a3b8;margin-top:3px}
+.score{
+  min-width:55px;
+  text-align:center;
+  padding:5px;
+  border-radius:7px;
+  background:#172033;
+  color:#38bdf8;
+  font-size:11px;
+  font-weight:800
+}
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:9px
+}
+.actions .btn{padding:6px 8px;font-size:9px}
 
 .empty{
   text-align:center;
-  color:#667085;
-  padding:35px 10px
+  color:#64748b;
+  font-size:11px;
+  padding:25px 5px
 }
 
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.45);
-  display:flex;
+  z-index:100;
+  display:none;
   align-items:center;
   justify-content:center;
-  padding:18px;
-  z-index:50
+  padding:14px;
+  background:rgba(0,0,0,.82)
 }
-
-.modal-card{
+.modal.show{display:flex}
+.modal-box{
   width:100%;
-  max-width:430px;
-  background:#fff;
-  border-radius:16px;
-  padding:25px;
-  box-shadow:0 20px 60px rgba(0,0,0,.2)
+  max-width:520px;
+  max-height:90vh;
+  overflow:auto;
+  background:#0d1422;
+  border:1px solid #334155;
+  border-radius:14px;
+  padding:16px
+}
+.result{
+  white-space:pre-wrap;
+  background:#080d17;
+  border:1px solid #1e293b;
+  border-radius:9px;
+  padding:12px;
+  font-size:11px;
+  color:#cbd5e1;
+  margin:10px 0
 }
 
 .notice{
-  padding:11px 13px;
-  border-radius:9px;
-  background:#fef3c7;
-  color:#92400e;
-  margin-top:12px;
-  font-size:13px
+  font-size:10px;
+  color:#64748b;
+  margin-top:8px
 }
 
-@media(max-width:800px){
+@media(max-width:600px){
   .stats{grid-template-columns:repeat(2,1fr)}
-}
-
-@media(max-width:520px){
-  .topbar{padding:13px 14px}
-  .container{padding:18px 12px}
-  .auth-card{margin:25px auto;padding:22px}
-  .stats{grid-template-columns:1fr 1fr}
-  .filters{grid-template-columns:1fr}
+  .tools{grid-template-columns:1fr}
+  .hero h1{font-size:23px}
 }
 </style>
 </head>
 
 <body>
 
-<header class="topbar">
-  <div class="logo">AutoLead AI</div>
-  <div id="healthBadge" class="status-badge">
-    Checking...
+<nav class="nav">
+  <div class="logo">🏠 AutoLead AI</div>
+  <div id="health" class="badge">Checking...</div>
+</nav>
+
+<div class="wrap">
+
+<section id="authPage" class="auth">
+
+  <div class="hero">
+    <h1>Real Estate <span>Lead Intelligence</span></h1>
+    <p>Real data. Real leads. Real AI analysis.</p>
   </div>
-</header>
 
-<main class="container">
+  <div class="card">
 
-<!-- ================= AUTH ================= -->
-
-<section id="authSection">
-
-  <div class="auth-card">
-
-    <h1>Real Estate Lead Intelligence</h1>
-
-    <p class="subtitle">
-      Import your authorized leads and use AI to prioritize
-      follow-ups without inventing lead information.
-    </p>
-
-    <div id="signupFields">
-
-      <label for="name">Name</label>
-      <input
-        id="name"
-        type="text"
-        placeholder="Your name"
-        autocomplete="name"
-      >
-
+    <div class="auth-tabs">
+      <button id="loginTab" class="active" onclick="switchAuth('login')">Login</button>
+      <button id="signupTab" onclick="switchAuth('signup')">Create Account</button>
     </div>
 
-    <label for="email">Email</label>
+    <div id="loginForm">
+      <div class="title">🔐 Agent Login</div>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="you@example.com"
-      autocomplete="email"
-    >
+      <label>Email</label>
+      <input id="loginEmail" type="email" autocomplete="email">
 
-    <label for="password">Password</label>
+      <label>Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password">
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Minimum 8 characters"
-      autocomplete="current-password"
-    >
+      <button id="loginBtn" class="btn primary full" onclick="login()">
+        Login
+      </button>
 
-    <div class="auth-actions">
+      <button class="btn gray full" onclick="forgotPassword()">
+        Forgot Password
+      </button>
+    </div>
 
-      <button
-        id="authBtn"
-        class="btn"
-        onclick="submitAuth()"
-      >
+    <div id="signupForm" class="hidden">
+      <div class="title">🚀 Create Agent Account</div>
+
+      <label>Name</label>
+      <input id="signupName" autocomplete="name">
+
+      <label>Email</label>
+      <input id="signupEmail" type="email" autocomplete="email">
+
+      <label>Password</label>
+      <input id="signupPassword" type="password" autocomplete="new-password">
+
+      <button id="signupBtn" class="btn primary full" onclick="signup()">
         Create Account
       </button>
 
-      <button
-        id="forgotBtn"
-        class="link-btn"
-        onclick="openForgot()"
-      >
-        Forgot Password?
-      </button>
-
-      <button
-        id="switchBtn"
-        class="btn secondary"
-        onclick="toggleAuthMode()"
-      >
-        Already have an account? Login
-      </button>
-
+      <div class="notice">
+        Free trial: 7 days or 10 authorized leads.
+      </div>
     </div>
 
   </div>
-
 </section>
 
 
-<!-- ================= RESET PASSWORD ================= -->
+<section id="appPage" class="hidden">
 
-<section id="resetSection" class="hidden">
-
-  <div class="auth-card">
-
-    <h1>Reset Password</h1>
-
-    <p class="subtitle">
-      Create a new password for your AutoLead AI account.
-    </p>
-
-    <label for="newPassword">
-      New Password
-    </label>
-
-    <input
-      id="newPassword"
-      type="password"
-      placeholder="Minimum 8 characters"
-      autocomplete="new-password"
-    >
-
-    <label for="confirmPassword">
-      Confirm Password
-    </label>
-
-    <input
-      id="confirmPassword"
-      type="password"
-      placeholder="Enter password again"
-      autocomplete="new-password"
-    >
-
-    <div class="auth-actions">
-
-      <button
-        id="resetBtn"
-        class="btn"
-        onclick="resetPassword()"
-      >
-        Update Password
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="cancelReset()"
-      >
-        Back to Login
-      </button>
-
-    </div>
-
+  <div class="hero">
+    <h1>AutoLead AI <span>Dashboard</span></h1>
+    <p>Real-estate lead management and AI intelligence</p>
   </div>
 
-</section>
-
-
-<!-- ================= DASHBOARD ================= -->
-
-<section id="dashboardSection" class="hidden">
-
-  <div class="dashboard-header">
-
-    <div>
-      <h1>Dashboard</h1>
-      <p id="welcome" class="subtitle"></p>
-    </div>
-
-    <button
-      class="btn secondary"
-      onclick="logout()"
-    >
-      Logout
-    </button>
-
-  </div>
-
-  <div id="trial" class="trial">
+  <div id="trialBox" class="trial">
     Loading trial...
   </div>
 
   <div class="stats">
-
     <div class="stat">
-      <div class="stat-title">
-        Total Leads
-      </div>
-      <div id="totalLeads" class="stat-value">
-        0
-      </div>
+      <b id="total">0</b>
+      <span>Total</span>
     </div>
-
     <div class="stat">
-      <div class="stat-title">
-        Hot Leads
-      </div>
-      <div id="hotLeads" class="stat-value">
-        0
-      </div>
+      <b id="qualified">0</b>
+      <span>Qualified</span>
     </div>
-
     <div class="stat">
-      <div class="stat-title">
-        Qualified
-      </div>
-      <div id="qualifiedLeads" class="stat-value">
-        0
-      </div>
+      <b id="visits">0</b>
+      <span>Visits</span>
     </div>
-
     <div class="stat">
-      <div class="stat-title">
-        Converted
-      </div>
-      <div id="convertedLeads" class="stat-value">
-        0
-      </div>
+      <b id="booked">0</b>
+      <span>Booked</span>
     </div>
-
   </div>
 
+  <div class="card">
+    <div class="title">📥 Real Data Import</div>
 
-  <!-- IMPORT -->
+    <input id="csvInput" type="file" accept=".csv">
+
+    <button id="importBtn" class="btn green full" onclick="importCSV()">
+      Import Authorized CSV
+    </button>
+
+    <div class="notice">
+      Only authorized CRM/CSV data is accepted. No fake leads and no private-number scraping.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">🔎 Lead Search</div>
+
+    <label>Search</label>
+    <input id="searchBox" placeholder="Name, city, email, requirement..." oninput="render()">
+
+    <label>Status</label>
+    <select id="filterStatus" onchange="render()">
+      <option value="All">All</option>
+      <option>New</option>
+      <option>Qualified</option>
+      <option>Contacted</option>
+      <option>Interested</option>
+      <option>Site Visit</option>
+      <option>Negotiation</option>
+      <option>Booked</option>
+      <option>Converted</option>
+    </select>
+  </div>
 
   <div class="card">
 
-    <h2>Import Authorized Leads</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+      <div class="title" style="margin:0">🏠 Sales Pipeline</div>
 
-    <p class="subtitle">
-      Only upload lead data that you are authorized to use.
-    </p>
-
-    <div class="import-row">
-
-      <input
-        id="csvFile"
-        type="file"
-        accept=".csv,text/csv"
-      >
-
-      <button
-        id="importBtn"
-        class="btn"
-        onclick="importCSV()"
-      >
-        Import CSV
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- LEADS -->
-
-  <div class="card">
-
-    <div class="dashboard-header">
-
-      <div>
-        <h2>Your Leads</h2>
+      <div style="display:flex;gap:5px">
+        <button class="btn gray" onclick="exportCSV()">Export</button>
+        <button class="btn red" onclick="logout()">Logout</button>
       </div>
-
-      <button
-        class="btn secondary"
-        onclick="refresh()"
-      >
-        Refresh
-      </button>
-
     </div>
 
-    <div class="filters">
-
-      <input
-        id="search"
-        type="search"
-        placeholder="Search name, phone, email, location..."
-        oninput="render()"
-      >
-
-      <select
-        id="statusFilter"
-        onchange="render()"
-      >
-        <option value="">All Statuses</option>
-        <option>New</option>
-        <option>Qualified</option>
-        <option>Contacted</option>
-        <option>Interested</option>
-        <option>Site Visit</option>
-        <option>Negotiation</option>
-        <option>Booked</option>
-        <option>Converted</option>
-      </select>
-
+    <div id="leads">
+      <div class="empty">No leads imported yet.</div>
     </div>
-
-    <div id="leads" class="leads"></div>
 
   </div>
 
 </section>
 
-</main>
+</div>
 
 
-<!-- ================= FORGOT MODAL ================= -->
+<div id="aiModal" class="modal">
+  <div class="modal-box">
 
-<div id="forgotModal" class="modal hidden">
+    <div class="title">✨ Gemini Lead Analysis</div>
 
-  <div class="modal-card">
-
-    <h2>Forgot Password?</h2>
-
-    <p class="subtitle">
-      Enter your account email. If an account exists,
-      we'll send a secure password reset link.
-    </p>
-
-    <label for="forgotEmail">
-      Email
-    </label>
-
-    <input
-      id="forgotEmail"
-      type="email"
-      placeholder="you@example.com"
-      autocomplete="email"
-    >
-
-    <div class="auth-actions">
-
-      <button
-        id="forgotSubmitBtn"
-        class="btn"
-        onclick="forgotPassword()"
-      >
-        Send Reset Link
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="closeForgot()"
-      >
-        Cancel
-      </button>
-
+    <div id="aiResult" class="result">
+      Analyzing...
     </div>
 
-  </div>
+    <button class="btn gray full" onclick="closeAI()">
+      Close
+    </button>
 
+  </div>
 </div>
 
 
 <script>
-/* ================= CONFIG ================= */
 
-const API =
-  "https://autolead-ai-v4.onrender.com";
+const API="https://autolead-ai-v4.onrender.com";
 
-
-/* ================= STATE ================= */
-
-let loginMode = false;
-let leads = [];
-let currentUser = null;
+let leads=[];
+let currentLead=null;
 
 
-/* ================= DOM ================= */
+async function api(path,opt={}){
 
-const authSection =
-  document.getElementById("authSection");
+  const headers=opt.headers||{};
+  const token=localStorage.getItem("autolead_token");
 
-const resetSection =
-  document.getElementById("resetSection");
-
-const dashboardSection =
-  document.getElementById("dashboardSection");
-
-const signupFields =
-  document.getElementById("signupFields");
-
-const authBtn =
-  document.getElementById("authBtn");
-
-const switchBtn =
-  document.getElementById("switchBtn");
-
-const forgotModal =
-  document.getElementById("forgotModal");
-
-const healthBadge =
-  document.getElementById("healthBadge");
-
-
-/* ================= API ================= */
-
-async function api(path, options = {}) {
-
-  const headers =
-    options.headers || {};
-
-  const token =
-    localStorage.getItem(
-      "autolead_token"
-    );
-
-  if (token) {
-    headers.Authorization =
-      "Bearer " + token;
+  if(token){
+    headers.Authorization="Bearer "+token;
   }
 
-  const response =
-    await fetch(
-      API + path,
-      {
-        ...options,
-        headers
-      }
-    );
+  const r=await fetch(API+path,{
+    ...opt,
+    headers
+  });
 
-  const data =
-    await response
-      .json()
-      .catch(() => ({}));
+  const d=await r.json().catch(()=>({}));
 
-  if (!response.ok) {
+  if(!r.ok){
 
-    const message =
-      data.error ||
-      data.message ||
+    const msg=
+      d.error ||
       "Request failed";
 
-    let details = "";
+    const detail=
+      d.details ?
+      ": "+JSON.stringify(d.details):
+      "";
 
-    if (data.details) {
-      details =
-        typeof data.details === "string"
-          ? data.details
-          : " " +
-            data.details
-              .map(x => x.msg || "")
-              .filter(Boolean)
-              .join(", ");
+    throw Error(msg+detail);
+  }
+
+  return d;
+}
+
+
+function switchAuth(type){
+
+  const login=type==="login";
+
+  document.getElementById("loginForm").classList.toggle("hidden",!login);
+  document.getElementById("signupForm").classList.toggle("hidden",login);
+
+  document.getElementById("loginTab").classList.toggle("active",login);
+  document.getElementById("signupTab").classList.toggle("active",!login);
+}
+
+
+async function health(){
+
+  const badge=document.getElementById("health");
+
+  try{
+
+    const d=await api("/api/health");
+
+    if(d.database==="connected"){
+
+      badge.textContent=
+        d.ai ?
+        "🟢 Backend + DB + Gemini":
+        "🟢 Backend + DB";
+
+      badge.className="badge active";
+
+    }else{
+
+      badge.textContent="🔴 Database Error";
+      badge.className="badge error";
     }
 
-    throw new Error(
-      message + details
-    );
-  }
+  }catch(e){
 
-  return data;
-}
-
-
-/* ================= BUSY BUTTON ================= */
-
-function setBusy(
-  button,
-  busy,
-  text
-) {
-
-  if (!button) return;
-
-  if (busy) {
-
-    button.disabled = true;
-
-    button.dataset.oldText =
-      button.textContent;
-
-    button.innerHTML =
-      '<span class="spinner"></span>' +
-      text;
-
-  } else {
-
-    button.disabled = false;
-
-    button.textContent =
-      button.dataset.oldText ||
-      text;
+    badge.textContent="🔴 Backend Disconnected";
+    badge.className="badge error";
   }
 }
 
 
-/* ================= AUTH MODE ================= */
+async function signup(){
 
-function toggleAuthMode() {
+  const btn=document.getElementById("signupBtn");
 
-  loginMode = !loginMode;
+  const name=document.getElementById("signupName").value.trim();
+  const email=document.getElementById("signupEmail").value.trim();
+  const password=document.getElementById("signupPassword").value;
 
-  if (loginMode) {
+  if(!name||!email||!password){
 
-    signupFields.classList.add(
-      "hidden"
-    );
-
-    authBtn.textContent =
-      "Login";
-
-    switchBtn.textContent =
-      "Create a new account";
-
-  } else {
-
-    signupFields.classList.remove(
-      "hidden"
-    );
-
-    authBtn.textContent =
-      "Create Account";
-
-    switchBtn.textContent =
-      "Already have an account? Login";
-  }
-}
-
-
-/* ================= SIGNUP / LOGIN ================= */
-
-async function submitAuth() {
-
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("password")
-      .value;
-
-  const name =
-    document
-      .getElementById("name")
-      .value
-      .trim();
-
-  if (!email) {
-    alert("Please enter your email.");
+    alert("Please fill all fields.");
     return;
   }
 
-  if (!password) {
-    alert("Please enter your password.");
-    return;
-  }
+  btn.disabled=true;
+  btn.textContent="Creating...";
 
-  if (!loginMode && !name) {
-    alert("Please enter your name.");
-    return;
-  }
+  try{
 
-  const oldText =
-    authBtn.textContent;
+    const d=await api("/api/auth/signup",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        name,
+        email,
+        password
+      })
+    });
 
-  setBusy(
-    authBtn,
-    true,
-    loginMode
-      ? "Logging in..."
-      : "Creating account..."
-  );
+    localStorage.setItem("autolead_token",d.token);
 
-  try {
-
-    const payload =
-      loginMode
-        ? {
-            email,
-            password
-          }
-        : {
-            name,
-            email,
-            password
-          };
-
-    const data =
-      await api(
-        loginMode
-          ? "/api/auth/login"
-          : "/api/auth/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-          body:
-            JSON.stringify(payload)
-        }
-      );
-
-    if (!data.token) {
-      throw new Error(
-        "Authentication token was not returned."
-      );
-    }
-
-    localStorage.setItem(
-      "autolead_token",
-      data.token
-    );
-
-    currentUser =
-      data.user || null;
-
-    showDashboard();
-
+    showApp();
     await refresh();
 
-  } catch (error) {
+  }catch(e){
 
-    alert(
-      error.message ||
-      "Authentication failed."
-    );
+    alert(e.message);
 
-  } finally {
+  }finally{
 
-    authBtn.disabled = false;
-    authBtn.textContent =
-      oldText;
+    btn.disabled=false;
+    btn.textContent="Create Account";
   }
 }
 
 
-/* ================= SCREEN CONTROL ================= */
+async function login(){
 
-function showDashboard() {
+  const btn=document.getElementById("loginBtn");
 
-  authSection.classList.add(
-    "hidden"
-  );
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
 
-  resetSection.classList.add(
-    "hidden"
-  );
+  if(!email||!password){
 
-  dashboardSection.classList.remove(
-    "hidden"
-  );
-
-  if (currentUser) {
-
-    document.getElementById(
-      "welcome"
-    ).textContent =
-      "Welcome, " +
-      currentUser.name;
+    alert("Enter email and password.");
+    return;
   }
-}
 
-function showLogin() {
+  btn.disabled=true;
+  btn.textContent="Logging in...";
 
-  dashboardSection.classList.add(
-    "hidden"
-  );
+  try{
 
-  resetSection.classList.add(
-    "hidden"
-  );
+    const d=await api("/api/auth/login",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        email,
+        password
+      })
+    });
 
-  authSection.classList.remove(
-    "hidden"
-  );
-}
+    localStorage.setItem("autolead_token",d.token);
 
+    showApp();
+    await refresh();
 
-/* ================= LOGOUT ================= */
+  }catch(e){
 
-function logout() {
+    alert(e.message);
 
-  localStorage.removeItem(
-    "autolead_token"
-  );
+  }finally{
 
-  currentUser = null;
-  leads = [];
-
-  showLogin();
-}
-
-
-/* ================= HEALTH ================= */
-
-async function health() {
-
-  try {
-
-    const data =
-      await api("/api/health");
-
-    let text =
-      "🟢 Backend + DB";
-
-    if (data.ai) {
-      text += " + Gemini";
-    }
-
-    if (data.email) {
-      text += " + Email";
-    }
-
-    healthBadge.textContent =
-      text;
-
-    healthBadge.className =
-      "status-badge active";
-
-  } catch {
-
-    healthBadge.textContent =
-      "🔴 Backend Disconnected";
-
-    healthBadge.className =
-      "status-badge";
+    btn.disabled=false;
+    btn.textContent="Login";
   }
 }
 
 
-/* ================= REFRESH ================= */
+async function forgotPassword(){
 
-async function refresh() {
+  const email=prompt("Enter your account email:");
 
-  try {
+  if(!email)return;
 
-    const [trialData, leadData] =
-      await Promise.all([
-        api("/api/trial"),
-        api("/api/leads")
-      ]);
+  try{
 
-    leads =
-      Array.isArray(leadData)
-        ? leadData
-        : [];
+    const d=await api("/api/auth/forgot-password",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        email:email.trim()
+      })
+    });
 
-    document.getElementById(
-      "trial"
-    ).textContent =
-      `Trial: ${
-        trialData.active
-          ? "Active"
-          : "Expired"
-      } • ${
-        trialData.daysLeft
-      } day(s) left • ${
-        trialData.leadsRemaining
-      } lead(s) remaining`;
+    alert(d.message||"If the account exists, a reset email has been sent.");
+
+  }catch(e){
+
+    alert(e.message);
+  }
+}
+
+
+function showApp(){
+
+  document.getElementById("authPage").classList.add("hidden");
+  document.getElementById("appPage").classList.remove("hidden");
+}
+
+
+function showAuth(){
+
+  document.getElementById("appPage").classList.add("hidden");
+  document.getElementById("authPage").classList.remove("hidden");
+}
+
+
+function logout(){
+
+  localStorage.removeItem("autolead_token");
+
+  leads=[];
+
+  showAuth();
+}
+
+
+async function refresh(){
+
+  try{
+
+    const [trialData,leadData]=await Promise.all([
+      api("/api/trial"),
+      api("/api/leads")
+    ]);
+
+    leads=Array.isArray(leadData)?leadData:[];
+
+    document.getElementById("trialBox").textContent=
+      `Trial: ${trialData.active?"Active":"Expired"} • `+
+      `${trialData.daysLeft} day(s) left • `+
+      `${trialData.leadsRemaining} lead(s) remaining`;
 
     render();
 
-  } catch (error) {
+  }catch(e){
 
-    if (
-      error.message.includes(
-        "Authentication"
-      ) ||
-      error.message.includes(
-        "Invalid or expired token"
-      )
-    ) {
+    if(
+      e.message.includes("Authentication")||
+      e.message.includes("expired")||
+      e.message.includes("Invalid")
+    ){
 
       logout();
-      return;
-    }
+      alert("Your session expired. Please login again.");
 
-    alert(
-      error.message ||
-      "Could not refresh dashboard."
-    );
+    }else{
+
+      alert(e.message);
+    }
   }
 }
 
 
-/* ================= RENDER ================= */
+async function importCSV(){
 
-function render() {
+  const input=document.getElementById("csvInput");
+  const btn=document.getElementById("importBtn");
 
-  const container =
-    document.getElementById(
-      "leads"
+  const file=input.files[0];
+
+  if(!file){
+
+    alert("Select a CSV file first.");
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent="Importing...";
+
+  try{
+
+    const form=new FormData();
+
+    form.append("file",file);
+
+    const d=await api("/api/leads/import",{
+      method:"POST",
+      body:form
+    });
+
+    alert(
+      `Imported: ${d.imported}\n`+
+      `Duplicates: ${d.duplicates}\n`+
+      `Invalid: ${d.invalid}`
     );
 
-  const search =
-    document
-      .getElementById("search")
+    input.value="";
+
+    await refresh();
+
+  }catch(e){
+
+    alert(e.message);
+
+  }finally{
+
+    btn.disabled=false;
+    btn.textContent="Import Authorized CSV";
+  }
+}
+
+
+function render(){
+
+  const total=leads.length;
+
+  const qualified=leads.filter(
+    x=>x.lead_status==="Qualified"
+  ).length;
+
+  const visits=leads.filter(
+    x=>x.lead_status==="Site Visit"
+  ).length;
+
+  const booked=leads.filter(
+    x=>x.lead_status==="Booked"
+  ).length;
+
+  document.getElementById("total").textContent=total;
+  document.getElementById("qualified").textContent=qualified;
+  document.getElementById("visits").textContent=visits;
+  document.getElementById("booked").textContent=booked;
+
+
+  const q=
+    document.getElementById("searchBox")
       .value
       .trim()
       .toLowerCase();
 
-  const status =
-    document
-      .getElementById("statusFilter")
-      .value;
+  const status=
+    document.getElementById("filterStatus").value;
 
-  const filtered =
-    leads.filter(lead => {
 
-      const haystack =
-        [
-          lead.name,
-          lead.phone,
-          lead.email,
-          lead.location,
-          lead.property_requirement,
-          lead.budget,
-          lead.buyer_segment
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+  const filtered=leads.filter(l=>{
 
-      const matchesSearch =
-        !search ||
-        haystack.includes(search);
+    const text=[
+      l.name,
+      l.email,
+      l.phone,
+      l.location,
+      l.property_requirement,
+      l.budget,
+      l.buyer_segment
+    ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 
-      const matchesStatus =
-        !status ||
-        lead.lead_status === status;
+    return(
+      (status==="All"||l.lead_status===status)&&
+      text.includes(q)
+    );
+  });
 
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
-    });
 
-  document.getElementById(
-    "totalLeads"
-  ).textContent =
-    leads.length;
+  const box=document.getElementById("leads");
 
-  document.getElementById(
-    "hotLeads"
-  ).textContent =
-    leads.filter(
-      x =>
-        x.lead_temperature ===
-        "Hot"
-    ).length;
+  if(!filtered.length){
 
-  document.getElementById(
-    "qualifiedLeads"
-  ).textContent =
-    leads.filter(
-      x =>
-        x.lead_status ===
-        "Qualified"
-    ).length;
-
-  document.getElementById(
-    "convertedLeads"
-  ).textContent =
-    leads.filter(
-      x =>
-        x.lead_status ===
-        "Converted"
-    ).length;
-
-  if (!filtered.length) {
-
-    container.innerHTML =
-      `<div class="empty">
-        No leads found.
-      </div>`;
+    box.innerHTML=
+      `<div class="empty">No matching real leads.</div>`;
 
     return;
   }
 
-  container.innerHTML =
-    filtered
-      .map(lead => leadHTML(lead))
-      .join("");
-}
 
+  box.innerHTML=filtered.map(l=>{
 
-/* ================= ESCAPE HTML ================= */
+    const score=
+      Number.isInteger(l.lead_score)?
+      l.lead_score:
+      "—";
 
-function esc(value) {
+    return `
+      <div class="lead">
 
-  return String(
-    value ?? ""
-  )
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+        <div class="lead-head">
 
+          <div>
 
-/* ================= LEAD HTML ================= */
+            <div class="lead-name">
+              ${escapeHtml(l.name||"Unnamed")}
+            </div>
 
-function leadHTML(lead) {
+            <div class="meta">
+              ${escapeHtml(l.location||"Location not provided")}
+              •
+              ${escapeHtml(l.buyer_segment||"Segment unknown")}
+            </div>
 
-  const phone =
-    lead.phone || "";
+            <div class="meta">
+              ${escapeHtml(l.property_requirement||"Requirement not provided")}
+              •
+              ${escapeHtml(l.budget||"Budget not provided")}
+            </div>
 
-  const email =
-    lead.email || "";
-
-  const score =
-    lead.lead_score != null
-      ? lead.lead_score
-      : "—";
-
-  return `
-    <div class="lead">
-
-      <div class="lead-top">
-
-        <div>
-
-          <div class="lead-name">
-            ${esc(lead.name)}
           </div>
 
-          <div class="meta">
+          <div class="score">
+            AI: ${score}
+          </div>
 
-            ${
-              phone
-                ? "📞 " +
-                  esc(phone) +
-                  "<br>"
-                : ""
-            }
+        </div>
 
-            ${
-              email
-                ? "✉️ " +
-                  esc(email) +
-                  "<br>"
-                : ""
-            }
 
-            ${
-              lead.location
-                ? "📍 " +
-                  esc(lead.location)
-                : ""
-       
+        <div class="meta">
+          📞 ${escapeHtml(l.phone||"Not provided")}
+          •
+          ✉️ ${escapeHtml(l.email||"Not provided")}
+        </div>
+
+        <div class="meta">
+          Status:
+          ${escapeHtml(l.lead_status||"New")}
+          •
+          Verification:
+          ${escapeHtml(l.verification_status||"Needs Verification")}
+        </div>
+
+
+        <div class="actions">
+
+          <button class="btn purple"
+            onclick="analyzeLead(${Number(l.id)})">
+            ✨ AI Analyze
+          </button>
+
+          ${
+            l.phone?
+            `<button class="btn green"
+              onclick="whatsapp('${encodeURIComponent(l.phone)}')">
+              WhatsApp
+            </button>`:""
+          }
+
+          ${
+            l.phone?
+            `<button class="btn primary"
+              onclick="callLead('${encodeURIComponent(l.phone)}')">
+              Call
+            </button>`:""
+          }
+
+          <select
+            style="width:auto;min-width:115px;padding:6px"
+            onchange="changeStatus(${Number(l.id)},this.value)">
+
+            ${statusOptions(l.lead_status)}
+
+          </select>
+
+        </div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+
+function statusOptions(current){
+
+  const statuses=[
+    "New",
+    "Qualified",
+    "Contacted",
+    "Interested",
+    "Site Visit",
+    "Negotiation",
+    "Booked",
+    "Converted"
+  ];
+
+  return statuses.map(s=>
+    `<option ${s===current?"selected":""}>${s}</option>`
+  ).join("");
+}
+
+
+async function changeStatus(id,status){
+
+  try{
+
+    await api(`/api/leads/${id}/status`,{
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        status
+      })
+    });
+
+    await refresh();
+
+  }catch(e){
+
+    alert(e.message);
+  }
+}
+
+
+async function analyzeLead(id){
+
+  const modal=document.getElementById("aiModal");
+  const result=document.getElementById("aiResult");
+
+  modal.classList.add("show");
+
+  result.textContent="Gemini is analyzing the real lead data...";
+
+  try{
+
+    const d=await api("/api/ai/analyze",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        leadId:id
+      })
+    });
+
+    result.textContent=
+      JSON.stringify(d.analysis,null,2);
+
+    await refresh();
+
+  }catch(e){
+
+    result.textContent=
+      "AI analysis failed:\n\n"+e.message;
+  }
+}
+
+
+function closeAI(){
+
+  document.getElementById("aiModal")
+    .classList.remove("show");
+}
+
+
+function whatsapp(phone){
+
+  window.open(
+    "https://wa.me/"+decodeURIComponent(phone),
+    "_blank"
+  );
+}
+
+
+function callLead(phone){
+
+  window.location.href=
+    "tel:+"+decodeURIComponent(phone);
+}
+
+
+function exportCSV(){
+
+  if(!leads.length){
+
+    alert("There are no real leads to export.");
+    return;
+  }
+
+  const headers=[
+    "Name",
+    "Phone",
+    "Email",
+    "Location",
+    "Property Requirement",
+    "Budget",
+    "Buyer Segment",
+    "Source",
+    "Verification Status",
+    "AI Score",
+    "AI Temperature",
+    "Lead Status",
+    "Notes"
+  ];
+
+  const rows=leads.map(l=>[
+    l.name,
+    l.phone,
+    l.email,
+    l.location,
+    l.property_requirement,
+    l.budget,
+    l.buyer_segment,
+    l.source,
+    l.verification_status,
+    l.lead_score,
+    l.lead_temperature,
+    l.lead_status,
+    l.notes
+  ]);
+
+  const csv=[
+    headers,
+    ...rows
+  ]
+  .map(row=>
+    row.map(csvCell).join(",")
+  )
+  .join("\n");
+
+  const blob=new Blob(
+    [csv],
+    {type:"text/csv;charset=utf-8"}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+
+  a.href=url;
+  a.download="AutoLead_AI_Real_Leads.csv";
+
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+function csvCell(v){
+
+  return `"${String(v??"").replace(/"/g,'""')}"`;
+}
+
+
+function escapeHtml(v){
+
+  return String(v??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+health();
+
+if(localStorage.getItem("autolead_token")){
+
+  showApp();
+  refresh();
+}
+
+</script>
+
+</body>
+        </html>
