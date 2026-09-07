@@ -52,24 +52,127 @@ const pool = new Pool({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
 const GEMINI_MODEL =
   process.env.GEMINI_MODEL || "gemini-3-flash-preview";
 
-const TRIAL_DAYS = Number(process.env.TRIAL_DAYS) || 7;
-const TRIAL_LEADS = Number(process.env.TRIAL_LEADS) || 10;
+const TRIAL_DAYS =
+  Number(process.env.TRIAL_DAYS) || 7;
+
+const TRIAL_LEADS =
+  Number(process.env.TRIAL_LEADS) || 10;
 
 if (!JWT_SECRET) {
   console.error("FATAL: JWT_SECRET missing");
   process.exit(1);
 }
 
-function validate(req, res, next) {
-  const e = validationResult(req);
+/* =========================
+   DATABASE INITIALIZATION
+========================= */
 
-  if (!e.isEmpty()) {
+async function initializeDatabase() {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id BIGSERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(254) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS agent_trials (
+        agent_id BIGINT PRIMARY KEY
+          REFERENCES users(id) ON DELETE CASCADE,
+        trial_start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        leads_processed_count INTEGER NOT NULL DEFAULT 0
+          CHECK (leads_processed_count >= 0),
+        is_active BOOLEAN NOT NULL DEFAULT TRUE
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS leads (
+        id BIGSERIAL PRIMARY KEY,
+        agent_id BIGINT NOT NULL
+          REFERENCES users(id) ON DELETE CASCADE,
+        name VARCHAR(150) NOT NULL,
+        phone VARCHAR(30),
+        email VARCHAR(254),
+        location VARCHAR(150),
+        property_requirement VARCHAR(200),
+        budget VARCHAR(100),
+        buyer_segment VARCHAR(100),
+        source VARCHAR(150) NOT NULL,
+        verification_status VARCHAR(30)
+          NOT NULL DEFAULT 'Needs Verification',
+        last_verified_date DATE,
+        lead_score INTEGER
+          CHECK (
+            lead_score IS NULL
+            OR lead_score BETWEEN 0 AND 100
+          ),
+        lead_temperature VARCHAR(10),
+        lead_status VARCHAR(30)
+          NOT NULL DEFAULT 'New',
+        notes TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_leads_agent_created
+      ON leads(agent_id, created_at DESC);
+    `);
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_leads_agent_status
+      ON leads(agent_id, lead_status);
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS lead_activities (
+        id BIGSERIAL PRIMARY KEY,
+        lead_id BIGINT NOT NULL
+          REFERENCES leads(id) ON DELETE CASCADE,
+        agent_id BIGINT NOT NULL
+          REFERENCES users(id) ON DELETE CASCADE,
+        activity_type VARCHAR(50) NOT NULL,
+        details TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query("COMMIT");
+
+    console.log("Database tables initialized successfully.");
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error("DATABASE INITIALIZATION ERROR:", e);
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/* =========================
+   HELPERS
+========================= */
+
+function validate(req, res, next) {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
     return res.status(400).json({
       error: "Validation failed",
-      details: e.array(),
+      details: errors.array(),
     });
   }
 
@@ -135,7 +238,7 @@ app.get("/api/health", async (req, res) => {
       model: GEMINI_MODEL,
     });
   } catch (e) {
-    console.error("Health error:", e);
+    console.error("HEALTH ERROR:", e);
 
     res.status(503).json({
       status: "unhealthy",
@@ -168,36 +271,44 @@ app.post(
   ],
   validate,
   async (req, res) => {
-    const c = await pool.connect();
+    const client = await pool.connect();
 
     try {
-      await c.query("BEGIN");
+      await client.query("BEGIN");
 
-      const hash = await bcrypt.hash(
+      const passwordHash = await bcrypt.hash(
         req.body.password,
         12
       );
 
-      const result = await c.query(
-        `INSERT INTO users(name, email, password_hash)
-         VALUES($1, $2, $3)
-         RETURNING id, name, email`,
+      const result = await client.query(
+        `
+        INSERT INTO users(
+          name,
+          email,
+          password_hash
+        )
+        VALUES($1, $2, $3)
+        RETURNING id, name, email
+        `,
         [
           req.body.name,
           req.body.email,
-          hash,
+          passwordHash,
         ]
       );
 
       const user = result.rows[0];
 
-      await c.query(
-        `INSERT INTO agent_trials(agent_id)
-         VALUES($1)`,
+      await client.query(
+        `
+        INSERT INTO agent_trials(agent_id)
+        VALUES($1)
+        `,
         [user.id]
       );
 
-      await c.query("COMMIT");
+      await client.query("COMMIT");
 
       res.status(201).json({
         token: tokenFor(user),
@@ -205,7 +316,7 @@ app.post(
       });
     } catch (e) {
       try {
-        await c.query("ROLLBACK");
+        await client.query("ROLLBACK");
       } catch {}
 
       console.error("SIGNUP ERROR:", e);
@@ -222,7 +333,7 @@ app.post(
         code: e.code,
       });
     } finally {
-      c.release();
+      client.release();
     }
   }
 );
@@ -245,9 +356,15 @@ app.post(
   async (req, res) => {
     try {
       const result = await pool.query(
-        `SELECT id, name, email, password_hash
-         FROM users
-         WHERE email = $1`,
+        `
+        SELECT
+          id,
+          name,
+          email,
+          password_hash
+        FROM users
+        WHERE email = $1
+        `,
         [req.body.email]
       );
 
@@ -292,9 +409,11 @@ app.post(
 app.get("/api/trial", auth, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT *
-       FROM agent_trials
-       WHERE agent_id = $1`,
+      `
+      SELECT *
+      FROM agent_trials
+      WHERE agent_id = $1
+      `,
       [req.user.id]
     );
 
@@ -310,7 +429,9 @@ app.get("/api/trial", auth, async (req, res) => {
       0,
       TRIAL_DAYS -
         (Date.now() -
-          new Date(trial.trial_start_date).getTime()) /
+          new Date(
+            trial.trial_start_date
+          ).getTime()) /
           86400000
     );
 
@@ -318,11 +439,13 @@ app.get("/api/trial", auth, async (req, res) => {
       active:
         trial.is_active &&
         days > 0 &&
-        trial.leads_processed_count < TRIAL_LEADS,
+        trial.leads_processed_count <
+          TRIAL_LEADS,
 
       daysLeft: Math.ceil(days),
 
-      leadsUsed: trial.leads_processed_count,
+      leadsUsed:
+        trial.leads_processed_count,
 
       leadsRemaining: Math.max(
         0,
@@ -353,10 +476,12 @@ app.get("/api/trial", auth, async (req, res) => {
 app.get("/api/leads", auth, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT *
-       FROM leads
-       WHERE agent_id = $1
-       ORDER BY created_at DESC`,
+      `
+      SELECT *
+      FROM leads
+      WHERE agent_id = $1
+      ORDER BY created_at DESC
+      `,
       [req.user.id]
     );
 
@@ -387,23 +512,26 @@ app.post(
       });
     }
 
-    const c = await pool.connect();
+    const client = await pool.connect();
 
     try {
-      await c.query("BEGIN");
+      await client.query("BEGIN");
 
-      const trialResult = await c.query(
-        `SELECT *
-         FROM agent_trials
-         WHERE agent_id = $1
-         FOR UPDATE`,
-        [req.user.id]
-      );
+      const trialResult =
+        await client.query(
+          `
+          SELECT *
+          FROM agent_trials
+          WHERE agent_id = $1
+          FOR UPDATE
+          `,
+          [req.user.id]
+        );
 
       const trial = trialResult.rows[0];
 
       if (!trial || expired(trial)) {
-        await c.query("ROLLBACK");
+        await client.query("ROLLBACK");
 
         return res.status(403).json({
           error: "Free trial expired",
@@ -429,7 +557,10 @@ app.post(
       let duplicates = 0;
       let invalid = 0;
 
-      for (const row of rows.slice(0, remaining)) {
+      for (const row of rows.slice(
+        0,
+        remaining
+      )) {
         const pick = (...keys) => {
           for (const key of keys) {
             const field = Object.keys(row).find(
@@ -489,26 +620,36 @@ app.post(
           "buyer segment"
         );
 
-        if (!name || (!phone && !email)) {
+        if (
+          !name ||
+          (!phone && !email)
+        ) {
           invalid++;
           continue;
         }
 
         const duplicateResult =
-          await c.query(
-            `SELECT id
-             FROM leads
-             WHERE agent_id = $1
-             AND (
-               ($2 IS NOT NULL
+          await client.query(
+            `
+            SELECT id
+            FROM leads
+            WHERE agent_id = $1
+            AND (
+              (
+                $2 IS NOT NULL
                 AND $2 <> ''
-                AND phone = $2)
-               OR
-               ($3 IS NOT NULL
+                AND phone = $2
+              )
+              OR
+              (
+                $3 IS NOT NULL
                 AND $3 <> ''
-                AND LOWER(email) = LOWER($3))
-             )
-             LIMIT 1`,
+                AND LOWER(email) =
+                    LOWER($3)
+              )
+            )
+            LIMIT 1
+            `,
             [
               req.user.id,
               phone,
@@ -521,8 +662,9 @@ app.post(
           continue;
         }
 
-        await c.query(
-          `INSERT INTO leads(
+        await client.query(
+          `
+          INSERT INTO leads(
             agent_id,
             name,
             phone,
@@ -545,7 +687,8 @@ app.post(
             $8,
             $9,
             'Needs Verification'
-          )`,
+          )
+          `,
           [
             req.user.id,
             name,
@@ -562,29 +705,32 @@ app.post(
         imported++;
       }
 
-      await c.query(
-        `UPDATE agent_trials
-         SET leads_processed_count =
-           leads_processed_count + $1
-         WHERE agent_id = $2`,
+      await client.query(
+        `
+        UPDATE agent_trials
+        SET leads_processed_count =
+          leads_processed_count + $1
+        WHERE agent_id = $2
+        `,
         [
           imported,
           req.user.id,
         ]
       );
 
-      await c.query("COMMIT");
+      await client.query("COMMIT");
 
       res.json({
         success: true,
         imported,
         duplicates,
         invalid,
-        message: `${imported} authorized leads imported.`,
+        message:
+          `${imported} authorized leads imported.`,
       });
     } catch (e) {
       try {
-        await c.query("ROLLBACK");
+        await client.query("ROLLBACK");
       } catch {}
 
       console.error("CSV ERROR:", e);
@@ -594,7 +740,7 @@ app.post(
           "CSV could not be processed safely",
       });
     } finally {
-      c.release();
+      client.release();
     }
   }
 );
@@ -627,13 +773,15 @@ app.patch(
   async (req, res) => {
     try {
       const result = await pool.query(
-        `UPDATE leads
-         SET
-           lead_status = $1,
-           notes = COALESCE($2, notes)
-         WHERE id = $3
-         AND agent_id = $4
-         RETURNING *`,
+        `
+        UPDATE leads
+        SET
+          lead_status = $1,
+          notes = COALESCE($2, notes)
+        WHERE id = $3
+        AND agent_id = $4
+        RETURNING *
+        `,
         [
           req.body.status,
           req.body.notes || null,
@@ -649,7 +797,8 @@ app.patch(
       }
 
       await pool.query(
-        `INSERT INTO lead_activities(
+        `
+        INSERT INTO lead_activities(
           lead_id,
           agent_id,
           activity_type,
@@ -660,7 +809,8 @@ app.patch(
           $2,
           'Status Change',
           $3
-        )`,
+        )
+        `,
         [
           req.params.id,
           req.user.id,
@@ -685,7 +835,7 @@ app.patch(
 );
 
 /* =========================
-   GEMINI AI ANALYSIS
+   GEMINI AI
 ========================= */
 
 app.post(
@@ -700,7 +850,8 @@ app.post(
   async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({
-        error: "AI provider not connected",
+        error:
+          "AI provider not connected",
         message:
           "GEMINI_API_KEY is not configured on the server.",
       });
@@ -708,7 +859,8 @@ app.post(
 
     try {
       const result = await pool.query(
-        `SELECT
+        `
+        SELECT
           id,
           name,
           phone,
@@ -720,9 +872,10 @@ app.post(
           verification_status,
           lead_status,
           notes
-         FROM leads
-         WHERE id = $1
-         AND agent_id = $2`,
+        FROM leads
+        WHERE id = $1
+        AND agent_id = $2
+        `,
         [
           req.body.leadId,
           req.user.id,
@@ -796,7 +949,10 @@ ${JSON.stringify(lead)}
         Number.isInteger(analysis.score)
           ? Math.max(
               0,
-              Math.min(100, analysis.score)
+              Math.min(
+                100,
+                analysis.score
+              )
             )
           : null;
 
@@ -811,12 +967,14 @@ ${JSON.stringify(lead)}
         : null;
 
       await pool.query(
-        `UPDATE leads
-         SET
-           lead_score = $1,
-           lead_temperature = $2
-         WHERE id = $3
-         AND agent_id = $4`,
+        `
+        UPDATE leads
+        SET
+          lead_score = $1,
+          lead_temperature = $2
+        WHERE id = $3
+        AND agent_id = $4
+        `,
         [
           score,
           temperature,
@@ -842,15 +1000,4 @@ ${JSON.stringify(lead)}
   }
 );
 
-/* =========================
-   START SERVER
-========================= */
-
-const PORT =
-  Number(process.env.PORT) || 5000;
-
-app.listen(PORT, () => {
-  console.log(
-    `AutoLead AI V4 backend on :${PORT}`
-  );
-});
+/* ===================
