@@ -53,7 +53,7 @@ app.get("/api/trial",auth,async(req,res)=>{try{const r=await pool.query("SELECT 
  res.json({active:t.is_active&&days>0&&t.leads_processed_count<TRIAL_LEADS,daysLeft:Math.ceil(days),leadsUsed:t.leads_processed_count,leadsRemaining:Math.max(0,TRIAL_LEADS-t.leads_processed_count),limits:{days:TRIAL_DAYS,leads:TRIAL_LEADS}});
 }catch{res.status(500).json({error:"Signup failed",details:e.message,code:e.code});
 
-app.get("/api/leads",auth,async(req,res)=>{try{const r=await pool.query("SELECT * FROM leads WHERE agent_id=$1 ORDER BY created_at DESC",[req.user.id]);res.json(r.rows);}catch{res.status(500).json({error:"Failed to fetch leads"});}});
+app.get("/api/leads",auth,async(req,res)=>{try{const r=await pool.query("SELECT * FROM leads WHERE agent_id=$1 ORDER BY created_at DESC",[req.user.id]);res.json(r.rows);}catch(e){res.status(500).json({error:"Trial fetch failed",details:e.message,code:e.code});}
 
 app.post("/api/leads/import",auth,upload.single("file"),async(req,res)=>{
  if(!req.file)return res.status(400).json({error:"CSV file is required"});
