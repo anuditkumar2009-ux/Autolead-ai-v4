@@ -24,8 +24,41 @@ const API="https://autolead-ai-v4.onrender.com";let leads=[];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 async function api(path,opt={}){const h=opt.headers||{};const t=localStorage.getItem("autolead_token");if(t)h.Authorization="Bearer "+t;const r=await fetch(API+path,{...opt,headers:h});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
 async function health(){try{const d=await api("/api/health");badge.textContent=`🟢 Backend + DB ${d.ai?"+ Gemini":""}`;badge.className="status-badge active"}catch{badge.textContent="🔴 Backend Disconnected"}}
-async function signup(){try{const d=await api("/api/auth/signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:document.getElementById("name").value.trim(),email:email.value.trim(),password:password.value})});localStorage.setItem("autolead_token",d.token);show();refresh()}catch(e){alert(e.message)}}
-async function login(){try{const d=await api("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:email.value.trim(),password:password.value})});localStorage.setItem("autolead_token",d.token);show();refresh()}catch(e){alert(e.message)}}
+async function signup(){
+  try{
+    const d=await api("/api/auth/signup",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        name:document.getElementById("name").value.trim(),
+        email:document.getElementById("email").value.trim(),
+        password:document.getElementById("password").value
+      })
+    });
+    localStorage.setItem("autolead_token",d.token);
+    show();
+    refresh();
+  }catch(e){
+    alert(e.message);
+  }
+  }
+async function login(){
+  try{
+    const d=await api("/api/auth/login",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        email:document.getElementById("email").value.trim(),
+        password:document.getElementById("password").value
+      })
+    });
+    localStorage.setItem("autolead_token",d.token);
+    show();
+    refresh();
+  }catch(e){
+    alert(e.message);
+  }
+  }
 function show(){auth.classList.add("hidden");app.classList.remove("hidden")}function logout(){localStorage.removeItem("autolead_token");location.reload()}
 async function refresh(){try{const [t,l]=await Promise.all([api("/api/trial"),api("/api/leads")]);leads=l;trial.textContent=`Trial: ${t.active?"Active":"Expired"} • ${t.daysLeft} day(s) left • ${t.leadsRemaining} lead(s) remaining`;render()}catch(e){alert(e.message)}}
 async function importCSV(){const f=csv.files[0];if(!f)return alert("Select a CSV file first.");const fd=new FormData();fd.append("file",f);try{const d=await api("/api/leads/import",{method:"POST",body:fd});alert(d.message);refresh()}catch(e){alert(e.message)}}
