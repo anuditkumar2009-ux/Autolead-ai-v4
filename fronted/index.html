@@ -22,7 +22,7 @@ input,select{width:100%;background:#0b0f19;color:#fff;border:1px solid #1f2937;p
 <script>
 const API="https://autolead-ai-v4.onrender.com";let leads=[];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-async function api(path,opt={}){const h=opt.headers||{};const t=localStorage.getItem("autolead_token");if(t)h.Authorization="Bearer "+t;const r=await fetch(API+path,{...opt,headers:h});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error+(d.details?": "+d.details:"")+(d.code?" ["+d.code+"]":""));
+async function api(path,opt={}){const h=opt.headers||{};const t=localStorage.getItem("autolead_token");if(t)h.Authorization="Bearer "+t;const r=await fetch(API+path,{...opt,headers:h});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error+(d.details?": "+d.details:"")+(d.code?" ["+d.code+"]":""));return d}
 async function health(){try{const d=await api("/api/health");badge.textContent=`🟢 Backend + DB ${d.ai?"+ Gemini":""}`;badge.className="status-badge active"}catch{badge.textContent="🔴 Backend Disconnected"}}
 async function signup(){
   try{
