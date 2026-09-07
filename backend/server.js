@@ -51,7 +51,7 @@ app.post("/api/auth/login",[body("email").trim().isEmail().normalizeEmail(),body
 app.get("/api/trial",auth,async(req,res)=>{try{const r=await pool.query("SELECT * FROM agent_trials WHERE agent_id=$1",[req.user.id]);const t=r.rows[0];if(!t)return res.status(404).json({error:"Trial not found"});
  const days=Math.max(0,TRIAL_DAYS-(Date.now()-new Date(t.trial_start_date).getTime())/86400000);
  res.json({active:t.is_active&&days>0&&t.leads_processed_count<TRIAL_LEADS,daysLeft:Math.ceil(days),leadsUsed:t.leads_processed_count,leadsRemaining:Math.max(0,TRIAL_LEADS-t.leads_processed_count),limits:{days:TRIAL_DAYS,leads:TRIAL_LEADS}});
-}catch{res.status(500).json({error:"Failed to read trial"});}});
+}catch{res.status(500).json({error:"Signup failed",details:e.message,code:e.code});
 
 app.get("/api/leads",auth,async(req,res)=>{try{const r=await pool.query("SELECT * FROM leads WHERE agent_id=$1 ORDER BY created_at DESC",[req.user.id]);res.json(r.rows);}catch{res.status(500).json({error:"Failed to fetch leads"});}});
 
