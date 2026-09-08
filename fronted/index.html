@@ -572,7 +572,7 @@ button:disabled{
 
 .mini{
   padding:7px 9px;
-  border-radius:9px;
+  border-radius:999px;
   background:rgba(255,255,255,.035);
   border:1px solid rgba(255,255,255,.06);
   font-size:10px;
@@ -616,14 +616,6 @@ button:disabled{
 
 .btn-call{
   color:#8dc5ff
-}
-
-.btn-visit{
-  color:#d1b9ff
-}
-
-.btn-follow{
-  color:#ffd98d
 }
 
 .status-select{
@@ -672,22 +664,6 @@ button:disabled{
   padding:11px;
   font-weight:800;
   font-size:11px
-}
-
-.config-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px
-}
-
-.config-grid .field{
-  margin:0
-}
-
-.config-grid .field input,
-.config-grid .field select{
-  background:#141021;
-  color:#f5f1ff
 }
 
 .pipeline{
@@ -791,7 +767,6 @@ button:disabled{
 /* MOBILE */
 
 @media(max-width:900px){
-
   .grid{
     grid-template-columns:1fr
   }
@@ -821,7 +796,6 @@ button:disabled{
 }
 
 @media(max-width:560px){
-
   .topbar{
     height:62px;
     padding:0 13px
@@ -895,10 +869,6 @@ button:disabled{
     grid-template-columns:repeat(5,minmax(74px,1fr))
   }
 
-  .config-grid{
-    grid-template-columns:1fr
-  }
-
   .top-right .status{
     font-size:0;
     padding:8px
@@ -924,350 +894,202 @@ button:disabled{
 
 <div id="toast"></div>
 
-<!-- AUTH -->
+<!-- AUTH VIEW -->
 
 <section id="authView" class="auth-wrap">
-
   <div class="auth-glow"></div>
-
   <div class="auth-card">
-
     <div class="auth-brand">
       <span class="logo-mark">✦</span>
       AutoLead AI
     </div>
 
     <h1 id="authTitle">Welcome back</h1>
-
-    <p id="authDesc" class="sub">
-      Sign in to your AutoLead AI workspace.
-    </p>
+    <p id="authDesc" class="sub">Sign in to your AutoLead AI workspace.</p>
 
     <div id="signupNameWrap" class="field hidden">
       <label for="authName">Full name</label>
-      <input
-        id="authName"
-        type="text"
-        autocomplete="name"
-        placeholder="Your name"
-      >
+      <input id="authName" type="text" autocomplete="name" placeholder="Your name">
     </div>
 
     <div class="field">
       <label for="authEmail">Email</label>
-      <input
-        id="authEmail"
-        type="email"
-        autocomplete="email"
-        placeholder="you@company.com"
-      >
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@company.com">
     </div>
 
     <div class="field">
       <label for="authPassword">Password</label>
-      <input
-        id="authPassword"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Minimum 8 characters"
-      >
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Minimum 8 characters">
     </div>
 
     <div id="forgotRow" class="auth-actions">
-      <button
-        id="forgotBtn"
-        class="link-btn"
-        type="button"
-      >
-        Forgot password?
-      </button>
+      <button id="forgotBtn" class="link-btn" type="button">Forgot password?</button>
     </div>
 
-    <button
-      id="authBtn"
-      class="primary"
-      type="button"
-    >
-      Sign in
-    </button>
-
-    <button
-      id="switchBtn"
-      class="switch"
-      type="button"
-    >
-      Create an account
-    </button>
+    <button id="authBtn" class="primary" type="button">Sign in</button>
+    <button id="switchBtn" class="switch" type="button">Create an account</button>
 
     <div id="authMsg" class="auth-msg"></div>
 
     <div class="auth-foot">
-      Real authorized lead data only.
+      Real authorized lead data only.<br>
       No fake prospects or private-number scraping.
     </div>
-
   </div>
 </section>
 
-<!-- RESET PASSWORD -->
-
-<section id="resetView" class="auth-wrap hidden">
-
-  <div class="auth-glow"></div>
-
-  <div class="auth-card">
-
-    <div class="auth-brand">
-      <span class="logo-mark">✦</span>
-      AutoLead AI
-    </div>
-
-    <h1>Set new password</h1>
-
-    <p class="sub">
-      Choose a new password for your workspace.
-    </p>
-
-    <div class="field">
-      <label for="resetPassword">New password</label>
-      <input
-        id="resetPassword"
-        type="password"
-        autocomplete="new-password"
-        placeholder="Minimum 8 characters"
-      >
-    </div>
-
-    <div class="field">
-      <label for="resetPassword2">Confirm password</label>
-      <input
-        id="resetPassword2"
-        type="password"
-        autocomplete="new-password"
-        placeholder="Repeat password"
-      >
-    </div>
-
-    <button
-      id="resetBtn"
-      class="primary"
-      type="button"
-    >
-      Update password
-    </button>
-
-    <div id="resetMsg" class="auth-msg"></div>
-
-  </div>
-</section>
-
-<!-- APP -->
+<!-- APP VIEW -->
 
 <main id="appView" class="app hidden">
-
   <nav class="topbar">
-
     <div class="brand">
       <span class="logo-mark">✦</span>
       AutoLead AI
     </div>
 
     <div class="top-right">
-
       <div id="healthBadge" class="status">
         <span class="dot"></span>
-        <span>Checking system</span>
+        <span id="healthText">Checking system</span>
       </div>
 
-      <div id="userChip" class="user-chip">
-        Workspace
-      </div>
-
-      <button
-        id="logoutBtn"
-        class="logout"
-        type="button"
-      >
-        Log out
-      </button>
-
+      <div id="userChip" class="user-chip">Workspace</div>
+      <button id="logoutBtn" class="logout" type="button">Log out</button>
     </div>
   </nav>
 
   <div class="container">
-
     <header class="hero">
-
       <div>
-
-        <div class="eyebrow">
-          REAL ESTATE SALES INTELLIGENCE
-        </div>
-
-        <h2>
-          Turn buyer interest into
-          <span>real conversations.</span>
-        </h2>
-
-        <p>
-          Bring authorized leads into one workspace,
-          qualify them with AI, and keep every follow-up organized.
-        </p>
-
+        <div class="eyebrow">REAL ESTATE SALES INTELLIGENCE</div>
+        <h2>Turn buyer interest into <span>real conversations.</span></h2>
+        <p>Bring authorized leads into one workspace, qualify them with Gemini AI, and keep every follow-up organized.</p>
       </div>
 
-      <div id="trialPill" class="trial-pill">
-        Trial: checking…
-      </div>
-
+      <div id="trialPill" class="trial-pill">Trial: checking…</div>
     </header>
 
     <!-- STATS -->
-
     <section class="stats">
-
       <div class="stat">
-
-        <div class="stat-label">
-          Total leads
-        </div>
-
-        <div id="totalStat" class="stat-num">
-          0
-        </div>
-
-        <div class="stat-note">
-          From your connected data
-        </div>
-
+        <div class="stat-label">Total leads</div>
+        <div id="totalStat" class="stat-num">0</div>
+        <div class="stat-note">From your connected data</div>
       </div>
 
       <div class="stat">
-
-        <div class="stat-label">
-          Hot priority
-        </div>
-
-        <div id="hotStat" class="stat-num">
-          0
-        </div>
-
-        <div class="stat-note">
-          Highest AI temperature
-        </div>
-
+        <div class="stat-label">Hot priority</div>
+        <div id="hotStat" class="stat-num">0</div>
+        <div class="stat-note">Highest AI temperature</div>
       </div>
 
       <div class="stat">
-
-        <div class="stat-label">
-          Site visits
-        </div>
-
-        <div id="visitStat" class="stat-num">
-          0
-        </div>
-
-        <div class="stat-note">
-          Current pipeline stage
-        </div>
-
+        <div class="stat-label">Site visits</div>
+        <div id="visitStat" class="stat-num">0</div>
+        <div class="stat-note">Current pipeline stage</div>
       </div>
 
       <div class="stat">
-
-        <div class="stat-label">
-          Pipeline value
-        </div>
-
-        <div id="valueStat" class="stat-num">
-          ₹0
-        </div>
-
-        <div class="stat-note">
-          Estimated from available budget data
-        </div>
-
+        <div class="stat-label">Pipeline value</div>
+        <div id="valueStat" class="stat-num">₹0</div>
+        <div class="stat-note">Estimated from budget data</div>
       </div>
-
     </section>
 
     <div class="grid">
-
-      <!-- LEADS -->
-
+      <!-- LEADS LIST -->
       <section class="card">
-
         <div class="card-head">
-
           <div>
-
-            <div class="card-title">
-              Lead intelligence
-            </div>
-
-            <div class="card-sub">
-              Search, qualify and move genuine leads through your pipeline.
-            </div>
-
+            <div class="card-title">Lead intelligence</div>
+            <div class="card-sub">Search, qualify and move genuine leads through your pipeline.</div>
           </div>
 
           <div class="toolbar">
-
-            <input
-              id="searchBox"
-              class="search"
-              type="search"
-              placeholder="Search name, city, property…"
-            >
-
-            <select
-              id="filterStatus"
-              class="select-dark"
-            >
+            <input id="searchBox" class="search" type="search" placeholder="Search name, phone, notes…">
+            <select id="filterStatus" class="select-dark">
               <option value="All">All stages</option>
-              <option>New</option>
-              <option>Qualified</option>
-              <option>Contacted</option>
-              <option>Interested</option>
-              <option>Site Visit</option>
-              <option>Negotiation</option>
-              <option>Booked</option>
-              <option>Converted</option>
+              <option value="New">New</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Interested">Interested</option>
+              <option value="Site Visit">Site Visit</option>
+              <option value="Negotiation">Negotiation</option>
+              <option value="Booked">Booked</option>
+              <option value="Converted">Converted</option>
             </select>
-
           </div>
-
         </div>
 
         <div id="leadsBox" class="leads">
-
-          <div class="empty">
-            Sign in to load your real leads.
-          </div>
-
+          <div class="empty">Loading leads...</div>
         </div>
-
       </section>
 
       <!-- SIDEBAR -->
-
       <aside class="side-stack">
-
-        <!-- PIPELINE -->
-
+        <!-- CSV IMPORT -->
         <section class="card">
-
           <div class="card-head">
-
             <div>
+              <div class="card-title">Authorized CSV Import</div>
+              <div class="card-sub">Upload existing client lists</div>
+            </div>
+          </div>
 
-              <div class="card-title">
-                Pipeline
-              </div>
+          <div class="upload-zone">
+            <h4>Import CSV File</h4>
+            <p>File must contain columns like: Name, Phone, Email, Notes, Budget.</p>
+            <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            <button id="uploadCsvBtn" class="upload-btn" type="button">Select CSV File</button>
+          </div>
+        </section>
 
-              <div class="card-sub">
-                Live status distribution
-              </div>
+        <!-- PIPELINE STATUS -->
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Pipeline</div>
+              <div class="card-sub">Live status distribution</div>
+            </div>
+          </div>
 
-            
+          <div class="pipeline">
+            <div class="pipe"><b id="pipeNew">0</b><span>NEW</span></div>
+            <div class="pipe"><b id="pipeContacted">0</b><span>CONTACT</span></div>
+            <div class="pipe"><b id="pipeVisit">0</b><span>VISIT</span></div>
+            <div class="pipe"><b id="pipeNego">0</b><span>NEGO</span></div>
+            <div class="pipe"><b id="pipeWon">0</b><span>WON</span></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="footer">AutoLead AI V4 — Real Estate Lead Management & AI Scoring</div>
+  </div>
+</main>
+
+<!-- AI MODAL -->
+<div id="aiModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Gemini AI Analysis</div>
+    <div id="modalText" class="modal-text">Processing analysis...</div>
+    <div class="modal-actions">
+      <button id="copyPitchBtn" class="btn btn-wa" type="button">Copy Pitch</button>
+      <button id="closeModalBtn" class="btn close-btn" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://autolead-ai-v4.onrender.com";
+let isSignup = false;
+let currentLeads = [];
+
+// DOM Elements
+const authView = document.getElementById("authView");
+const appView = document.getElementById("appView");
+const authTitle = document.getElementById("authTitle");
+const authDesc = document.getElementById("authDesc");
+const signupNameWrap = document.getElementById("signupNameWrap");
+const 
