@@ -1,176 +1,559 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AutoLead AI — Real Estate Intelligence</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#090612">
+<title>AutoLead AI | Real Estate Growth Engine</title>
 
 <style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
 :root{
   --bg:#090612;
+  --bg2:#0e0919;
   --panel:#120d20;
   --panel2:#18102a;
+  --panel3:#201438;
   --line:rgba(255,255,255,.09);
   --text:#f8f7ff;
   --muted:#aaa2bd;
   --purple:#9b6cff;
   --purple2:#6d35e8;
-  --hot:#ff5d7a;
-  --warm:#ffb84d;
-  --cold:#67a8ff;
-  --green:#47d7a1;
-  --shadow:0 24px 80px rgba(0,0,0,.38);
-  --r:22px;
+  --purple3:#b997ff;
+  --green:#34d399;
+  --red:#fb7185;
+  --orange:#fbbf24;
+  --blue:#60a5fa;
 }
 
-*{box-sizing:border-box}
+html{
+  scroll-behavior:smooth;
+}
 
 body{
-  margin:0;
+  min-height:100vh;
   background:
-    radial-gradient(circle at 80% -10%,#351568 0,transparent 32%),
-    radial-gradient(circle at -10% 30%,#21103e 0,transparent 30%),
+    radial-gradient(circle at 15% 0%,rgba(123,67,220,.20),transparent 32%),
+    radial-gradient(circle at 90% 10%,rgba(102,55,232,.16),transparent 28%),
     var(--bg);
   color:var(--text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,
-  BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
-.hidden{display:none!important}
+button,input,select{
+  font:inherit;
+}
 
-/* TOP BAR */
+button{
+  -webkit-tap-highlight-color:transparent;
+}
 
-.top{
-  height:72px;
-  border-bottom:1px solid var(--line);
-  background:rgba(9,6,18,.78);
-  backdrop-filter:blur(18px);
+.hidden{
+  display:none!important;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(9,6,18,.82);
+  backdrop-filter:blur(10px);
+}
+
+.loading-overlay.active{
+  display:flex;
+}
+
+.loader-card{
+  width:min(330px,90%);
+  padding:25px;
+  text-align:center;
+  background:linear-gradient(145deg,#191029,#100a1b);
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+}
+
+.big-spinner{
+  width:42px;
+  height:42px;
+  border:4px solid rgba(255,255,255,.13);
+  border-top-color:var(--purple3);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  margin:0 auto 15px;
+}
+
+.loader-title{
+  font-size:15px;
+  font-weight:800;
+}
+
+.loader-text{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translate(-50%,20px);
+  opacity:0;
+  pointer-events:none;
+  z-index:10000;
+  max-width:90%;
+  padding:12px 16px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#18102a;
+  color:#fff;
+  box-shadow:0 15px 45px rgba(0,0,0,.45);
+  font-size:12px;
+  font-weight:700;
+  transition:.25s ease;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* =========================
+   AUTH
+========================= */
+
+.auth-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+}
+
+.auth-wrap{
+  width:100%;
+  max-width:1050px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  border:1px solid var(--line);
+  border-radius:30px;
+  overflow:hidden;
+  background:rgba(18,13,32,.82);
+  box-shadow:0 30px 100px rgba(0,0,0,.55);
+}
+
+.auth-brand{
+  padding:55px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(155,108,255,.32),transparent 30%),
+    radial-gradient(circle at 80% 80%,rgba(109,53,232,.24),transparent 30%),
+    #10091c;
+}
+
+.auth-brand:after{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  right:-120px;
+  top:-120px;
+  border-radius:50%;
+  border:1px solid rgba(185,151,255,.15);
+  box-shadow:0 0 0 35px rgba(185,151,255,.035),
+             0 0 0 70px rgba(185,151,255,.025);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+  font-size:21px;
+  letter-spacing:-.5px;
+}
+
+.logo-icon{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  box-shadow:0 8px 25px rgba(125,72,231,.4);
+}
+
+.auth-brand h1{
+  font-size:48px;
+  line-height:1.02;
+  letter-spacing:-2px;
+  margin-top:70px;
+  max-width:520px;
+}
+
+.auth-brand h1 span{
+  color:var(--purple3);
+}
+
+.auth-brand p{
+  color:var(--muted);
+  max-width:500px;
+  margin-top:18px;
+  line-height:1.7;
+  font-size:14px;
+}
+
+.auth-points{
+  margin-top:30px;
+  display:grid;
+  gap:12px;
+}
+
+.auth-point{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  color:#ddd7e8;
+  font-size:12px;
+}
+
+.auth-point i{
+  width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:rgba(155,108,255,.12);
+  color:var(--purple3);
+  font-style:normal;
+}
+
+.auth-card{
+  padding:45px;
+  background:rgba(18,13,32,.94);
+}
+
+.auth-card h2{
+  font-size:27px;
+  letter-spacing:-.8px;
+}
+
+.auth-card .sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:7px;
+  margin-bottom:25px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  color:#d9d2e7;
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.input{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#0c0815;
+  color:#fff;
+  outline:none;
+  transition:.2s;
+}
+
+.input:focus{
+  border-color:rgba(155,108,255,.7);
+  box-shadow:0 0 0 3px rgba(155,108,255,.08);
+}
+
+.auth-btn{
+  width:100%;
+  margin-top:8px;
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 10px 30px rgba(109,53,232,.25);
+  transition:.2s;
+}
+
+.auth-btn:hover{
+  transform:translateY(-1px);
+}
+
+.auth-btn:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.auth-msg{
+  min-height:20px;
+  margin-top:12px;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.auth-msg.error{
+  color:#fb7185;
+}
+
+.auth-msg.success{
+  color:#34d399;
+}
+
+.auth-switch{
+  margin-top:20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.text-btn{
+  border:0;
+  background:none;
+  color:var(--purple3);
+  font-weight:800;
+  cursor:pointer;
+}
+
+.forgot{
+  text-align:right;
+  margin-top:7px;
+}
+
+.forgot button{
+  border:0;
+  background:none;
+  color:#b997ff;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:700;
+}
+
+.mini-spinner{
+  width:14px;
+  height:14px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  border-radius:50%;
+  display:inline-block;
+  vertical-align:-2px;
+  margin-right:7px;
+  animation:spin .7s linear infinite;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app{
+  min-height:100vh;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  height:68px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 22px;
-  position:sticky;
-  top:0;
-  z-index:10;
+  padding:0 24px;
+  border-bottom:1px solid var(--line);
+  background:rgba(9,6,18,.82);
+  backdrop-filter:blur(18px);
 }
 
 .brand{
   display:flex;
   align-items:center;
-  gap:12px;
-  font-weight:800;
+  gap:10px;
+  font-weight:900;
 }
 
-.mark{
-  width:38px;
-  height:38px;
-  border-radius:13px;
-  background:linear-gradient(135deg,#b58aff,#6b35e5);
+.brand-mark{
+  width:34px;
+  height:34px;
   display:grid;
   place-items:center;
-  box-shadow:0 10px 30px #6d35e855;
-}
-
-.brand small{
-  display:block;
-  color:var(--muted);
-  font-weight:500;
-  font-size:11px;
-  margin-top:1px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
 }
 
 .top-actions{
   display:flex;
-  gap:9px;
   align-items:center;
+  gap:10px;
 }
 
-.ghost,
-.iconbtn{
-  background:#ffffff09;
-  color:var(--text);
+.status-pill{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 11px;
+  border-radius:20px;
+  border:1px solid rgba(52,211,153,.18);
+  background:rgba(52,211,153,.07);
+  color:var(--green);
+  font-size:10px;
+  font-weight:800;
+}
+
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:currentColor;
+  box-shadow:0 0 10px currentColor;
+}
+
+.logout-btn{
   border:1px solid var(--line);
-  padding:10px 13px;
-  border-radius:12px;
+  background:#140d23;
+  color:#ddd7e8;
+  padding:8px 11px;
+  border-radius:10px;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
 }
 
-/* MAIN */
+/* =========================
+   MAIN
+========================= */
 
-.wrap{
-  max-width:1380px;
+.main{
+  width:min(1380px,100%);
   margin:auto;
-  padding:28px 22px 50px;
+  padding:30px 24px 60px;
 }
 
 .hero{
   display:flex;
   justify-content:space-between;
-  gap:20px;
-  align-items:end;
-  margin:12px 0 25px;
+  gap:30px;
+  align-items:flex-end;
+  margin-bottom:25px;
 }
 
 .eyebrow{
-  color:#b99cff;
-  font-size:12px;
+  color:var(--purple3);
+  font-size:10px;
+  font-weight:900;
   text-transform:uppercase;
-  letter-spacing:.14em;
-  font-weight:800;
+  letter-spacing:1.5px;
 }
 
 .hero h1{
-  font-size:clamp(30px,5vw,54px);
-  line-height:1;
-  margin:8px 0 12px;
-  letter-spacing:-.04em;
+  font-size:38px;
+  letter-spacing:-1.8px;
+  margin-top:7px;
 }
 
 .hero p{
   color:var(--muted);
-  max-width:620px;
-  margin:0;
-  line-height:1.6;
+  max-width:650px;
+  font-size:13px;
+  margin-top:8px;
 }
 
-.status{
-  padding:10px 14px;
-  border:1px solid #ffffff12;
-  background:#ffffff08;
-  border-radius:999px;
-  color:var(--muted);
+.trial-box{
+  min-width:245px;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:linear-gradient(145deg,#171027,#100a1c);
+}
+
+.trial-title{
+  font-size:10px;
+  font-weight:900;
+  color:#ddd7e8;
+}
+
+.trial-value{
   font-size:12px;
-  white-space:nowrap;
+  color:var(--purple3);
+  font-weight:800;
+  margin-top:5px;
 }
 
-.status.active{
-  color:#72e8bc;
-  background:#47d7a10d;
-  border-color:#47d7a133;
+.trial-bar{
+  height:5px;
+  background:#251a37;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
 }
 
-/* STATS */
+.trial-progress{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--purple2),var(--purple3));
+  border-radius:20px;
+  transition:.4s;
+}
+
+/* =========================
+   STATS
+========================= */
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-
-.stat,
-.panel{
-  background:linear-gradient(145deg,#171027e8,#100b1be8);
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  border-radius:var(--r);
+  gap:13px;
+  margin-bottom:20px;
 }
 
 .stat{
-  padding:20px;
   position:relative;
   overflow:hidden;
+  padding:19px;
+  min-height:115px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(24,16,42,.94),rgba(14,9,25,.94));
+  transition:.25s;
+}
+
+.stat:hover{
+  transform:translateY(-2px);
+  border-color:rgba(155,108,255,.25);
 }
 
 .stat:after{
@@ -178,448 +561,612 @@ button{cursor:pointer;border:0}
   position:absolute;
   width:100px;
   height:100px;
-  background:#9b6cff18;
-  filter:blur(28px);
-  right:-35px;
-  top:-35px;
+  right:-40px;
+  bottom:-45px;
+  border-radius:50%;
+  background:rgba(155,108,255,.09);
 }
 
-.label{
+.stat-label{
   color:var(--muted);
-  font-size:12px;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.7px;
 }
 
-.num{
-  font-size:32px;
-  font-weight:850;
-  letter-spacing:-.04em;
-  margin-top:8px;
+.stat-num{
+  font-size:29px;
+  font-weight:900;
+  letter-spacing:-1px;
+  margin-top:12px;
 }
 
-.sub{
-  font-size:11px;
-  color:#777083;
-  margin-top:4px;
+.stat-sub{
+  color:#7e748f;
+  font-size:9px;
+  margin-top:3px;
 }
 
-/* GRID */
+/* =========================
+   GRID
+========================= */
 
 .grid{
   display:grid;
-  grid-template-columns:minmax(0,1.65fr) minmax(300px,.75fr);
+  grid-template-columns:1.55fr .75fr;
   gap:18px;
 }
 
 .panel{
-  padding:20px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:linear-gradient(145deg,rgba(24,16,42,.92),rgba(13,8,23,.94));
+  overflow:hidden;
+  margin-bottom:18px;
 }
 
-.panelhead{
+.panel-head{
+  padding:18px 19px;
   display:flex;
   justify-content:space-between;
-  gap:15px;
   align-items:center;
-  margin-bottom:17px;
+  gap:10px;
+  border-bottom:1px solid var(--line);
 }
 
-.paneltitle{
-  font-size:17px;
-  font-weight:800;
+.panel-title{
+  font-size:13px;
+  font-weight:900;
 }
 
-.panelhint{
+.panel-desc{
   color:var(--muted);
-  font-size:12px;
+  font-size:9px;
   margin-top:3px;
 }
 
-/* CONTROLS */
-
-.controls{
-  display:flex;
-  gap:9px;
-  flex-wrap:wrap;
+.panel-body{
+  padding:18px;
 }
 
-.input,
-.select{
-  background:#090611;
+/* =========================
+   PIPELINE
+========================= */
+
+.pipeline{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.pipe{
+  padding:12px;
   border:1px solid var(--line);
-  color:var(--text);
-  padding:11px 13px;
-  border-radius:12px;
+  background:#0e0919;
+  border-radius:13px;
+}
+
+.pipe-num{
+  font-size:20px;
+  font-weight:900;
+}
+
+.pipe-name{
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  margin-top:3px;
+  text-transform:uppercase;
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-row{
+  display:grid;
+  grid-template-columns:1fr 170px;
+  gap:9px;
+  margin-bottom:16px;
+}
+
+.select,.search{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#0c0815;
+  color:#fff;
   outline:none;
+  font-size:11px;
 }
 
-.input{
-  min-width:210px;
+.select:focus,.search:focus{
+  border-color:rgba(155,108,255,.6);
 }
 
-.input:focus,
-.select:focus{
-  border-color:#9b6cff77;
-  box-shadow:0 0 0 3px #9b6cff14;
-}
-
-/* LEADS */
+/* =========================
+   LEADS
+========================= */
 
 .leads{
   display:grid;
-  gap:11px;
+  gap:10px;
 }
 
 .lead{
-  background:#ffffff04;
+  padding:16px;
   border:1px solid var(--line);
-  border-radius:18px;
-  padding:15px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#181029,#110b1d);
   transition:.2s;
 }
 
 .lead:hover{
-  transform:translateY(-2px);
-  border-color:#9b6cff55;
-  background:#9b6cff08;
+  border-color:rgba(155,108,255,.25);
+  transform:translateY(-1px);
 }
 
-.leadtop{
+.lead-top{
   display:flex;
   justify-content:space-between;
+  align-items:flex-start;
   gap:12px;
 }
 
-.person{
-  display:flex;
-  gap:11px;
-  align-items:center;
+.lead-name{
+  font-size:14px;
+  font-weight:900;
 }
 
-.avatar{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:linear-gradient(135deg,#35205e,#1e1535);
-  display:grid;
-  place-items:center;
-  font-weight:800;
-  color:#cbb8ff;
-}
-
-.name{
-  font-weight:750;
-}
-
-.contact{
-  font-size:11px;
+.lead-meta{
   color:var(--muted);
-  margin-top:2px;
-  word-break:break-all;
-}
-
-.badge{
   font-size:10px;
-  font-weight:800;
-  padding:6px 9px;
-  border-radius:999px;
-  text-transform:uppercase;
-  letter-spacing:.05em;
-  height:max-content;
+  margin-top:4px;
+  line-height:1.5;
 }
 
-.hot{
-  background:#ff5d7a16;
-  color:#ff7890;
-  border:1px solid #ff5d7a33;
+.temp{
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:9px;
+  font-weight:900;
+  white-space:nowrap;
 }
 
-.warm{
-  background:#ffb84d16;
-  color:#ffc66c;
-  border:1px solid #ffb84d33;
+.temp.hot{
+  color:#fb7185;
+  background:rgba(251,113,133,.10);
+  border:1px solid rgba(251,113,133,.18);
 }
 
-.cold{
-  background:#67a8ff16;
-  color:#79b2ff;
-  border:1px solid #67a8ff33;
+.temp.warm{
+  color:#fbbf24;
+  background:rgba(251,191,36,.10);
+  border:1px solid rgba(251,191,36,.18);
 }
 
-/* LEAD META */
+.temp.cold{
+  color:#60a5fa;
+  background:rgba(96,165,250,.10);
+  border:1px solid rgba(96,165,250,.18);
+}
 
-.meta{
+.temp.unknown{
+  color:#aaa2bd;
+  background:rgba(170,162,189,.08);
+  border:1px solid var(--line);
+}
+
+.lead-info{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:8px;
-  margin:13px 0;
+  margin-top:13px;
 }
 
-.meta div{
-  background:#00000020;
-  border-radius:12px;
+.info-box{
   padding:9px;
-}
-
-.meta b{
-  display:block;
-  font-size:12px;
-  margin-top:3px;
-}
-
-.meta span{
-  font-size:10px;
-  color:var(--muted);
-}
-
-/* BUTTONS */
-
-.actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-}
-
-.btn{
-  padding:9px 12px;
-  border-radius:11px;
-  background:#ffffff08;
+  border-radius:10px;
+  background:#0e0919;
   border:1px solid var(--line);
-  color:var(--text);
-  font-size:12px;
 }
 
-.btn.primary{
-  background:linear-gradient(135deg,#9b6cff,#7137e8);
-  border-color:transparent;
-  box-shadow:0 8px 25px #6d35e833;
-}
-
-.btn:hover{
-  filter:brightness(1.13);
-}
-
-/* SIDEBAR */
-
-.side{
-  display:grid;
-  gap:18px;
-  align-content:start;
-}
-
-.importbox{
-  border:1px dashed #9b6cff66;
-  background:linear-gradient(145deg,#9b6cff0d,#ffffff03);
-  padding:20px;
-  border-radius:18px;
-}
-
-.importbox h3{
-  margin:0 0 8px;
-}
-
-.importbox p{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.55;
-}
-
-.file{
-  width:100%;
-  margin:10px 0;
-  padding:11px;
-  background:#090611;
-  border:1px solid var(--line);
-  color:var(--muted);
-  border-radius:12px;
-}
-
-.filelabel{
-  display:block;
-  margin:10px 0 6px;
-  font-size:11px;
-  color:var(--muted);
-}
-
-.ai{
-  background:linear-gradient(145deg,#251441,#130d21);
-  border-color:#9b6cff30;
-}
-
-.ai .orb{
-  width:44px;
-  height:44px;
-  border-radius:15px;
-  background:linear-gradient(135deg,#c09dff,#7339ec);
-  display:grid;
-  place-items:center;
-  margin-bottom:14px;
-  box-shadow:0 12px 35px #7439ec55;
-}
-
-.ai p{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.6;
-}
-
-.empty{
-  padding:42px 20px;
-  text-align:center;
-  color:var(--muted);
-  border:1px dashed var(--line);
-  border-radius:18px;
-}
-
-/* TOAST */
-
-.toast{
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  background:#181129;
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  padding:13px 16px;
-  border-radius:14px;
-  z-index:50;
-  font-size:13px;
-}
-
-/* AUTH */
-
-.auth{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:22px;
-  background:
-    radial-gradient(circle at 50% 0,#3a176b 0,transparent 38%),
-    var(--bg);
-}
-
-.authbox{
-  width:min(440px,100%);
-  background:#120c20e8;
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  border-radius:28px;
-  padding:28px;
-}
-
-.authbox h1{
-  font-size:30px;
-  margin:15px 0 7px;
-}
-
-.authbox p{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.55;
-}
-
-.form{
-  display:grid;
-  gap:10px;
-  margin-top:20px;
-}
-
-.form input{
-  width:100%;
-  background:#090611;
-  border:1px solid var(--line);
-  color:white;
-  padding:13px;
-  border-radius:13px;
-  outline:none;
-}
-
-.form button{
-  padding:13px;
-  border-radius:13px;
-  background:linear-gradient(135deg,#a678ff,#6d35e8);
-  color:#fff;
+.info-label{
+  color:#777087;
+  font-size:8px;
   font-weight:800;
+  text-transform:uppercase;
 }
 
-.switch{
-  background:none;
-  color:#b99cff;
+.info-value{
+  color:#e7e1ef;
+  font-size:10px;
+  font-weight:800;
+  margin-top:3px;
+  word-break:break-word;
+}
+
+.score{
+  margin-top:13px;
+}
+
+.score-line{
+  display:flex;
+  justify-content:space-between;
+  font-size:9px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.score-bar{
+  height:5px;
+  border-radius:10px;
+  background:#281b3b;
+  overflow:hidden;
+}
+
+.score-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--purple2),var(--purple3));
+  border-radius:10px;
+}
+
+.lead-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
   margin-top:14px;
 }
 
-.tiny{
-  font-size:11px;
-  color:#777083;
+.lead-status{
+  padding:7px 9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#0d0817;
+  color:#ddd7e8;
+  font-size:9px;
+  outline:none;
 }
 
-/* RESPONSIVE */
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
 
-@media(max-width:950px){
-  .stats{
-    grid-template-columns:repeat(2,1fr);
+.action-btn{
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:7px 9px;
+  color:#fff;
+  cursor:pointer;
+  font-size:9px;
+  font-weight:800;
+  background:#171026;
+}
+
+.action-btn:hover{
+  border-color:rgba(155,108,255,.4);
+}
+
+.action-ai{
+  background:rgba(155,108,255,.14);
+  color:#cbb5ff;
+}
+
+.action-wa{
+  background:rgba(52,211,153,.10);
+  color:#5ee7b0;
+}
+
+.action-call{
+  background:rgba(96,165,250,.10);
+  color:#82b8ff;
+}
+
+.action-visit{
+  background:rgba(155,108,255,.12);
+  color:#c6aeff;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.side-card{
+  padding:18px;
+}
+
+.side-title{
+  font-size:12px;
+  font-weight:900;
+}
+
+.side-desc{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.6;
+  margin-top:5px;
+}
+
+.primary{
+  width:100%;
+  margin-top:13px;
+  border:0;
+  border-radius:12px;
+  padding:12px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  font-size:11px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.secondary{
+  width:100%;
+  margin-top:8px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px;
+  color:#ddd7e8;
+  background:#130c21;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.file-input{
+  display:none;
+}
+
+.setting{
+  margin-top:13px;
+}
+
+.setting label{
+  display:block;
+  color:#bbb2ca;
+  font-size:9px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.note{
+  color:#756b83;
+  font-size:8px;
+  line-height:1.5;
+  margin-top:9px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(4,2,8,.78);
+  backdrop-filter:blur(12px);
+}
+
+.modal.active{
+  display:flex;
+}
+
+.modal-card{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:linear-gradient(145deg,#191029,#0e0919);
+  box-shadow:0 30px 100px rgba(0,0,0,.65);
+}
+
+.modal-head{
+  padding:18px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-title{
+  font-size:14px;
+  font-weight:900;
+}
+
+.close-btn{
+  width:30px;
+  height:30px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#130c21;
+  color:#fff;
+  cursor:pointer;
+}
+
+.modal-body{
+  padding:18px;
+}
+
+.ai-box{
+  white-space:pre-wrap;
+  min-height:180px;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#0a0710;
+  color:#ddd7e8;
+  font-size:11px;
+  line-height:1.65;
+}
+
+.modal-actions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:10px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+  text-align:center;
+  padding:45px 20px;
+  border:1px dashed rgba(155,108,255,.20);
+  border-radius:15px;
+  background:rgba(155,108,255,.025);
+}
+
+.empty-icon{
+  font-size:28px;
+}
+
+.empty-title{
+  margin-top:10px;
+  font-size:13px;
+  font-weight:900;
+}
+
+.empty-text{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:5px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+  .auth-wrap{
+    grid-template-columns:1fr;
+  }
+
+  .auth-brand{
+    display:none;
   }
 
   .grid{
     grid-template-columns:1fr;
   }
 
-  .side{
-    grid-template-columns:repeat(2,1fr);
+  .hero{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .trial-box{
+    width:100%;
   }
 }
 
-@media(max-width:620px){
-  .top{
+@media(max-width:650px){
+  .topbar{
     padding:0 14px;
   }
 
-  .wrap{
-    padding:22px 14px 40px;
+  .status-pill{
+    display:none;
   }
 
-  .hero{
-    display:block;
+  .main{
+    padding:22px 13px 45px;
   }
 
-  .hero .status{
-    display:inline-block;
-    margin-top:16px;
+  .hero h1{
+    font-size:29px;
   }
 
   .stats{
-    gap:9px;
+    grid-template-columns:repeat(2,1fr);
   }
 
   .stat{
-    padding:15px;
+    min-height:100px;
+    padding:14px;
   }
 
-  .num{
-    font-size:27px;
+  .stat-num{
+    font-size:24px;
   }
 
-  .side{
+  .pipeline{
+    overflow:auto;
+    grid-template-columns:repeat(5,100px);
+  }
+
+  .search-row{
     grid-template-columns:1fr;
   }
 
-  .meta{
+  .lead-info{
     grid-template-columns:1fr 1fr;
   }
 
-  .meta div:last-child{
-    grid-column:span 2;
+  .lead-bottom{
+    align-items:flex-start;
+    flex-direction:column;
   }
 
-  .controls .input{
+  .actions{
     width:100%;
-    min-width:0;
   }
 
-  .panel{
-    padding:15px;
+  .action-btn{
+    flex:1;
+    min-width:90px;
   }
 
-  .top-actions .ghost{
-    display:none;
+  .modal-actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .auth-card{
+    padding:28px 20px;
+  }
+
+  .auth-screen{
+    padding:12px;
+  }
+}
+
+@media(max-width:420px){
+  .brand-text{
+    font-size:15px;
+  }
+
+  .logo-mark{
+    width:30px;
+    height:30px;
+  }
+
+  .stats{
+    gap:8px;
+  }
+
+  .lead-info{
+    grid-template-columns:1fr;
+  }
+
+  .lead-top{
+    flex-direction:column;
+  }
+
+  .temp{
+    align-self:flex-start;
   }
 }
 </style>
@@ -627,808 +1174,90 @@ button{cursor:pointer;border:0}
 
 <body>
 
-<!-- AUTH -->
+<!-- GLOBAL LOADER -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loader-card">
+    <div class="big-spinner"></div>
+    <div id="loaderTitle" class="loader-title">Please wait</div>
+    <div id="loaderText" class="loader-text">Connecting to AutoLead AI...</div>
+  </div>
+</div>
 
-<div id="auth" class="auth">
+<div id="toast" class="toast"></div>
 
-  <div class="authbox">
+<!-- =========================
+     AUTH SCREEN
+========================= -->
 
-    <div class="brand">
-      <div class="mark">✦</div>
+<section id="authScreen" class="auth-screen">
+  <div class="auth-wrap">
 
-      <div>
+    <div class="auth-brand">
+      <div class="logo">
+        <div class="logo-icon">⌂</div>
         AutoLead AI
-        <small>REAL ESTATE INTELLIGENCE</small>
+      </div>
+
+      <h1>
+        Turn real leads into
+        <span>real opportunities.</span>
+      </h1>
+
+      <p>
+        AI-powered real-estate lead qualification, follow-up and sales
+        intelligence built for modern property teams.
+      </p>
+
+      <div class="auth-points">
+        <div class="auth-point">
+          <i>✦</i>
+          Real authorized leads
+        </div>
+        <div class="auth-point">
+          <i>AI</i>
+          Gemini-powered qualification
+        </div>
+        <div class="auth-point">
+          <i>↗</i>
+          Faster follow-up and conversion
+        </div>
       </div>
     </div>
 
-    <h1 id="authTitle">Welcome back</h1>
-
-    <p id="authDesc">
-      Turn your existing property leads into qualified conversations.
-    </p>
-
-    <div class="form">
-
-      <input
-        id="authName"
-        class="hidden"
-        placeholder="Your name"
-      >
-
-      <input
-        id="authEmail"
-        type="email"
-        placeholder="Email address"
-      >
-
-      <input
-        id="authPassword"
-        type="password"
-        placeholder="Password"
-      >
-
-      <button id="authBtn" onclick="submitAuth()">
-        Sign in
-      </button>
-
-    </div>
-
-    <button
-      class="switch"
-      onclick="toggleAuth()"
-      id="switchBtn"
-    >
-      Create an account
-    </button>
-
-    <button
-      class="switch"
-      onclick="forgot()"
-      style="display:block"
-    >
-      Forgot password?
-    </button>
-
-    <div id="authMsg" class="tiny"></div>
-
-  </div>
-
-</div>
-
-
-<!-- APP -->
-
-<div id="app" class="app hidden">
-
-<header class="top">
-
-  <div class="brand">
-
-    <div class="mark">✦</div>
-
-    <div>
-      AutoLead AI
-      <small>REAL ESTATE INTELLIGENCE</small>
-    </div>
-
-  </div>
-
-  <div class="top-actions">
-
-    <span id="health" class="status">
-      Checking system…
-    </span>
-
-    <button
-      class="ghost"
-      onclick="logout()"
-    >
-      Logout
-    </button>
-
-  </div>
-
-</header>
-
-
-<main class="wrap">
-
-<section class="hero">
-
-  <div>
-
-    <div class="eyebrow">
-      Your sales command center
-    </div>
-
-    <h1>
-      Sell smarter.<br>
-      <span style="color:#a982ff">
-        Follow up faster.
-      </span>
-    </h1>
-
-    <p>
-      One place to organize your authorized property leads,
-      understand buyer intent and prioritize the conversations
-      most likely to convert.
-    </p>
-
-  </div>
-
-  <div id="trial" class="status">
-    Trial loading…
-  </div>
-
-</section>
-
-
-<!-- STATS -->
-
-<section class="stats">
-
-  <div class="stat">
-
-    <div class="label">
-      Total Leads
-    </div>
-
-    <div id="sTotal" class="num">
-      0
-    </div>
-
-    <div class="sub">
-      Imported into your workspace
-    </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="label">
-      Hot Priority
-    </div>
-
-    <div id="sHot" class="num">
-      0
-    </div>
-
-    <div class="sub">
-      Highest-intent conversations
-    </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="label">
-      Warm
-    </div>
-
-    <div id="sWarm" class="num">
-      0
-    </div>
-
-    <div class="sub">
-      Worth active follow-up
-    </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="label">
-      Follow-ups
-    </div>
-
-    <div id="sFollow" class="num">
-      0
-    </div>
-
-    <div class="sub">
-      Open leads needing action
-    </div>
-
-  </div>
-
-</section>
-
-
-<section class="grid">
-
-<!-- LEADS -->
-
-<div class="panel">
-
-  <div class="panelhead">
-
-    <div>
-
-      <div class="paneltitle">
-        Lead Intelligence
-      </div>
-
-      <div class="panelhint">
-        Real leads from your authorized data
-      </div>
-
-    </div>
-
-    <div class="controls">
-
-      <input
-        id="search"
-        class="input"
-        placeholder="Search name, phone, email…"
-        oninput="render()"
-      >
-
-      <select
-        id="filter"
-        class="select"
-        onchange="render()"
-      >
-
-        <option value="all">
-          All leads
-        </option>
-
-        <option value="hot">
-          Hot
-        </option>
-
-        <option value="warm">
-          Warm
-        </option>
-
-        <option value="cold">
-          Cold
-        </option>
-
-        <option value="new">
-          New
-        </option>
-
-        <option value="contacted">
-          Contacted
-        </option>
-
-        <option value="qualified">
-          Qualified
-        </option>
-
-      </select>
-
-    </div>
-
-  </div>
-
-
-  <div id="leads" class="leads"></div>
-
-</div>
-
-
-<!-- SIDEBAR -->
-
-<aside class="side">
-
-
-<div class="panel importbox">
-
-  <h3>
-    Import your leads
-  </h3>
-
-  <p>
-    Upload a CSV containing leads you are authorized to use.
-    AutoLead AI will store them securely and remove duplicates
-    by phone/email.
-  </p>
-
-  <label class="filelabel">
-    CSV file
-  </label>
-
-  <input
-    id="csv"
-    class="file"
-    type="file"
-    accept=".csv,text/csv"
-  >
-
-  <button
-    class="btn primary"
-    style="width:100%"
-    onclick="importCsv()"
-  >
-    Import securely
-  </button>
-
-  <div class="tiny" style="margin-top:9px">
-    No scraped or fake leads are generated.
-  </div>
-
-</div>
-
-
-<div class="panel ai">
-
-  <div class="orb">
-    ✦
-  </div>
-
-  <div class="paneltitle">
-    AI Qualification
-  </div>
-
-  <p>
-    Select <b>Analyze</b> on a lead to generate an AI
-    qualification summary from the lead's actual information.
-  </p>
-
-</div>
-
-
-<div class="panel">
-
-  <div class="paneltitle">
-    Built for property sales
-  </div>
-
-  <p
-    class="panelhint"
-    style="line-height:1.7"
-  >
-    Prioritize buyer intent, budget, location and
-    requirements without drowning in spreadsheets.
-  </p>
-
-</div>
-
-
-</aside>
-
-</section>
-
-</main>
-
-</div>
-
-
-<div id="toast" class="toast hidden"></div>
-
-
-<script>
-
-const API="https://autolead-ai-v4.onrender.com";
-
-let signupMode=false;
-let leads=[];
-
-
-/* SHORTCUT */
-
-const $=id=>document.getElementById(id);
-
-
-/* API */
-
-async function api(path,opt={}){
-
-  const h=opt.headers||{};
-
-  const t=localStorage.getItem("autolead_token");
-
-  if(t){
-    h.Authorization="Bearer "+t;
-  }
-
-  const r=await fetch(
-    API+path,
-    {
-      ...opt,
-      headers:h
-    }
-  );
-
-  const d=await r.json().catch(()=>({}));
-
-  if(!r.ok){
-
-    throw Error(
-      (d.error||"Request failed")+
-      (d.details?": "+d.details:"")+
-      (d.code?" ["+d.code+"]":"")
-    );
-
-  }
-
-  return d;
-
-}
-
-
-/* TOAST */
-
-function toast(m){
-
-  $("toast").textContent=m;
-
-  $("toast").classList.remove("hidden");
-
-  setTimeout(
-    ()=>$("toast").classList.add("hidden"),
-    2800
-  );
-
-}
-
-
-/* LOGIN / SIGNUP */
-
-function toggleAuth(){
-
-  signupMode=!signupMode;
-
-  $("authTitle").textContent=
-    signupMode
-    ?"Create your AutoLead AI account"
-    :"Welcome back";
-
-  $("authDesc").textContent=
-    signupMode
-    ?"Start with your authorized real-estate leads."
-    :"Turn your existing property leads into qualified conversations.";
-
-  $("authName").classList.toggle(
-    "hidden",
-    !signupMode
-  );
-
-  $("authBtn").textContent=
-    signupMode
-    ?"Create account"
-    :"Sign in";
-
-  $("switchBtn").textContent=
-    signupMode
-    ?"Already have an account"
-    :"Create an account";
-
-}
-
-
-/* AUTH SUBMIT */
-
-async function submitAuth(){
-
-  const email=
-    $("authEmail").value.trim();
-
-  const password=
-    $("authPassword").value;
-
-  const name=
-    $("authName").value.trim();
-
-  try{
-
-    const d=await api(
-      signupMode
-      ?"/api/auth/signup"
-      :"/api/auth/login",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":
-          "application/json"
-        },
-        body:JSON.stringify(
-          signupMode
-          ?{
-            name,
-            email,
-            password
-          }
-          :{
-            email,
-            password
-          }
-        )
-      }
-    );
-
-    localStorage.setItem(
-      "autolead_token",
-      d.token
-    );
-
-    show();
-
-    refresh();
-
-    toast("Welcome to AutoLead AI");
-
-  }catch(e){
-
-    $("authMsg").textContent=e.message;
-
-  }
-
-}
-
-
-/* PASSWORD RESET */
-
-async function forgot(){
-
-  const email=
-    $("authEmail").value.trim();
-
-  if(!email){
-
-    $("authMsg").textContent=
-      "Enter your email first.";
-
-    return;
-
-  }
-
-  try{
-
-    const d=await api(
-      "/api/auth/forgot-password",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":
-          "application/json"
-        },
-        body:JSON.stringify({email})
-      }
-    );
-
-    $("authMsg").textContent=
-      d.message||
-      "If the account exists, a reset email was requested.";
-
-  }catch(e){
-
-    $("authMsg").textContent=e.message;
-
-  }
-
-}
-
-
-/* SHOW APP */
-
-function show(){
-
-  $("auth").classList.add("hidden");
-
-  $("app").classList.remove("hidden");
-
-}
-
-
-/* LOGOUT */
-
-function logout(){
-
-  localStorage.removeItem(
-    "autolead_token"
-  );
-
-  location.reload();
-
-}
-
-
-/* HEALTH */
-
-async function health(){
-
-  try{
-
-    const d=
-      await api("/api/health");
-
-    $("health").textContent=
-      `🟢 Backend + DB ${d.ai?"+ Gemini":""}`;
-
-    $("health").className=
-      "status active";
-
-  }catch{
-
-    $("health").textContent=
-      "🔴 Backend disconnected";
-
-    $("health").className=
-      "status";
-
-  }
-
-}
-
-
-/* REFRESH */
-
-async function refresh(){
-
-  try{
-
-    const [t,l]=
-      await Promise.all([
-        api("/api/trial"),
-        api("/api/leads")
-      ]);
-
-    leads=
-      l.leads||
-      l||
-      [];
-
-    $("trial").textContent=
-      `Trial: ${t.active?"Active":"Expired"} • ${t.daysLeft} day(s) left • ${t.leadsRemaining} lead(s) remaining`;
-
-    $("trial").className=
-      "status "+
-      (t.active?"active":"");
-
-    updateStats();
-
-    render();
-
-  }catch(e){
-
-    toast(e.message);
-
-  }
-
-}
-
-
-/* STATS */
-
-function updateStats(){
-
-  $("sTotal").textContent=
-    leads.length;
-
-  $("sHot").textContent=
-    leads.filter(
-      x=>
-      String(
-        x.ai_temperature||
-        x.temperature||
-        ""
-      ).toLowerCase()==="hot"
-    ).length;
-
-  $("sWarm").textContent=
-    leads.filter(
-      x=>
-      String(
-        x.ai_temperature||
-        x.temperature||
-        ""
-      ).toLowerCase()==="warm"
-    ).length;
-
-  $("sFollow").textContent=
-    leads.filter(
-      x=>
-      ![
-        "closed",
-        "lost"
-      ].includes(
-        String(
-          x.status||
-          ""
-        ).toLowerCase()
-      )
-    ).length;
-
-}
-
-
-/* ESCAPE HTML */
-
-function esc(s){
-
-  return String(s??"")
-    .replace(
-      /[&<>"']/g,
-      m=>({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[m])
-    );
-
-}
-
-
-/* TEMPERATURE CLASS */
-
-function tempClass(t){
-
-  t=
-    String(t||"")
-    .toLowerCase();
-
-  return t==="hot"
-    ?"hot"
-    :t==="warm"
-    ?"warm"
-    :"cold";
-
-}
-
-
-/* RENDER */
-
-function render(){
-
-  const q=
-    $("search").value.toLowerCase();
-
-  const f=
-    $("filter").value;
-
-  const arr=
-    leads.filter(x=>{
-
-      const text=[
-        x.name,
-        x.phone,
-        x.email,
-        x.location,
-        x.requirement,
-        x.budget
-      ]
-      .join(" ")
-      .toLowerCase();
-
-      const temp=
-        String(
-          x.ai_temperature||
-          x.temperature||
-          ""
-        ).toLowerCase();
-
-      const status=
-        String(
-          x.status||
-          ""
-        ).toLowerCase();
-
-      return(
-        text.includes(q)&&
-        (
-          f==="all"||
-          f===temp||
-          f===status
-        )
-      );
-
-    });
-
-
-  if(!arr.length){
-
-    $("leads").innerHTML=`
-      <div class="empty">
-        No matching leads yet.
-        <br>
-        <span style="font-size:11px">
-          Import your authori
+    <div class="auth-card">
+
+      <div id="loginView">
+
+        <h2>Welcome back</h2>
+        <div class="sub">
+          Sign in to your AutoLead AI workspace.
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input
+            id="loginEmail"
+            class="input"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input
+            id="loginPassword"
+            class="input"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Your password">
+        </div>
+
+        <div class="forgot">
+          <button id="forgotBtn" type="button">
+            Forgot password?
+          </button>
+        </div>
+
+        <button id="loginBtn" class="auth-btn" type="button">
+       
