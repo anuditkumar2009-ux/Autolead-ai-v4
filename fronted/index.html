@@ -1,4 +1,1276 @@
-<script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090612">
+<title>AutoLead AI — Real Estate Sales Intelligence</title>
+
+<style>
+:root{
+  --bg:#08050f;
+  --panel:#100b1b;
+  --panel2:#171025;
+  --panel3:#1c1430;
+  --line:rgba(255,255,255,.09);
+  --text:#f8f7ff;
+  --muted:#aaa2bd;
+  --purple:#9b6cff;
+  --purple2:#6d35e8;
+  --green:#35d39a;
+  --yellow:#ffc857;
+  --red:#ff6b81;
+  --blue:#61a8ff;
+  --shadow:0 24px 70px rgba(0,0,0,.35)
+}
+
+*{
+  box-sizing:border-box
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(125,64,240,.18),transparent 34%),
+    radial-gradient(circle at 100% 15%,rgba(96,47,180,.13),transparent 30%),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+
+button,input,select{
+  font:inherit
+}
+
+button{
+  cursor:pointer
+}
+
+button:disabled{
+  cursor:not-allowed;
+  opacity:.65
+}
+
+.hidden{
+  display:none!important
+}
+
+/* TOAST */
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translate(-50%,20px);
+  z-index:9999;
+  background:#191126;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  border-radius:14px;
+  padding:12px 16px;
+  min-width:260px;
+  max-width:calc(100vw - 30px);
+  text-align:center;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s
+}
+
+.toast-show{
+  opacity:1!important;
+  transform:translate(-50%,0)!important
+}
+
+.toast-error{
+  border-color:rgba(255,107,129,.4)
+}
+
+/* LOADING */
+
+.spinner{
+  width:15px;
+  height:15px;
+  border:2px solid rgba(255,255,255,.28);
+  border-top-color:#fff;
+  border-radius:50%;
+  display:inline-block;
+  vertical-align:-3px;
+  margin-right:8px;
+  animation:spin .7s linear infinite
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* AUTH */
+
+.auth-wrap{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  position:relative;
+  overflow:hidden
+}
+
+.auth-glow{
+  position:absolute;
+  width:520px;
+  height:520px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(135,76,255,.25),transparent 65%);
+  filter:blur(10px);
+  top:-180px;
+  left:50%;
+  transform:translateX(-50%);
+  pointer-events:none
+}
+
+.auth-card{
+  width:min(100%,470px);
+  background:rgba(16,11,27,.9);
+  border:1px solid var(--line);
+  border-radius:30px;
+  padding:34px;
+  box-shadow:var(--shadow);
+  position:relative;
+  backdrop-filter:blur(18px)
+}
+
+.auth-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:850;
+  font-size:17px;
+  margin-bottom:35px
+}
+
+.logo-mark{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#b184ff,#6d35e8);
+  display:grid;
+  place-items:center;
+  box-shadow:0 10px 30px rgba(125,64,240,.35)
+}
+
+.auth-card h1{
+  font-size:36px;
+  letter-spacing:-1.5px;
+  margin:0 0 9px
+}
+
+.auth-card .sub{
+  color:var(--muted);
+  margin:0 0 30px;
+  font-size:15px
+}
+
+.field{
+  margin:0 0 16px
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:750;
+  margin:0 0 8px;
+  color:#d8d2e3
+}
+
+.field input,
+.field select,
+.search{
+  width:100%;
+  border:1px solid var(--line);
+  background:#f3f4ff;
+  color:#17121f;
+  border-radius:14px;
+  padding:14px 15px;
+  outline:none;
+  transition:.2s
+}
+
+.field input:focus,
+.field select:focus,
+.search:focus{
+  border-color:rgba(155,108,255,.75);
+  box-shadow:0 0 0 4px rgba(155,108,255,.1)
+}
+
+.auth-actions{
+  display:flex;
+  justify-content:flex-end;
+  margin:-2px 0 17px
+}
+
+.link-btn{
+  border:0;
+  background:none;
+  color:#bd9bff;
+  font-weight:750;
+  padding:4px 0
+}
+
+.primary{
+  width:100%;
+  border:0;
+  border-radius:15px;
+  padding:15px 18px;
+  background:linear-gradient(135deg,#a16aff,#7135eb);
+  color:#fff;
+  font-weight:850;
+  box-shadow:0 14px 34px rgba(112,53,235,.3);
+  min-height:52px
+}
+
+.switch{
+  width:100%;
+  margin-top:16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:#e9e4f5;
+  border-radius:14px;
+  padding:13px
+}
+
+.auth-msg{
+  min-height:20px;
+  margin:12px 0 0;
+  font-size:13px;
+  color:#ffb7c2
+}
+
+.auth-foot{
+  margin-top:20px;
+  color:#756d86;
+  font-size:11px;
+  text-align:center;
+  line-height:1.5
+}
+
+/* APP */
+
+.app{
+  min-height:100vh
+}
+
+.topbar{
+  height:70px;
+  border-bottom:1px solid var(--line);
+  background:rgba(8,5,15,.78);
+  backdrop-filter:blur(18px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:100
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:850
+}
+
+.brand .logo-mark{
+  width:34px;
+  height:34px;
+  border-radius:10px
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 11px;
+  border-radius:999px;
+  background:rgba(53,211,154,.08);
+  border:1px solid rgba(53,211,154,.2);
+  font-size:11px;
+  color:#9df2cd
+}
+
+.dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green)
+}
+
+.user-chip{
+  font-size:11px;
+  color:var(--muted);
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:10px
+}
+
+.logout{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:#ddd6e8;
+  border-radius:10px;
+  padding:8px 11px;
+  font-size:11px;
+  font-weight:750
+}
+
+.container{
+  width:min(1220px,calc(100% - 30px));
+  margin:auto;
+  padding:32px 0 60px
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:25px;
+  align-items:end;
+  margin-bottom:28px
+}
+
+.eyebrow{
+  color:#b99cff;
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:10px
+}
+
+.hero h2{
+  font-size:clamp(30px,5vw,52px);
+  line-height:.98;
+  letter-spacing:-2.5px;
+  margin:0;
+  max-width:720px
+}
+
+.hero h2 span{
+  background:linear-gradient(90deg,#fff,#b895ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent
+}
+
+.hero p{
+  color:var(--muted);
+  max-width:650px;
+  line-height:1.55;
+  margin:14px 0 0;
+  font-size:14px
+}
+
+.trial-pill{
+  padding:11px 14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  white-space:nowrap;
+  color:#d8d0e8;
+  font-size:12px
+}
+
+/* STATS */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:14px
+}
+
+.stat{
+  background:linear-gradient(145deg,rgba(28,20,48,.92),rgba(16,11,27,.92));
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:19px;
+  position:relative;
+  overflow:hidden
+}
+
+.stat:after{
+  content:"";
+  position:absolute;
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  background:rgba(155,108,255,.1);
+  right:-45px;
+  top:-45px
+}
+
+.stat-label{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:8px
+}
+
+.stat-num{
+  font-size:29px;
+  font-weight:900;
+  letter-spacing:-1px
+}
+
+.stat-note{
+  font-size:10px;
+  color:#70677f;
+  margin-top:6px
+}
+
+/* GRID */
+
+.grid{
+  display:grid;
+  grid-template-columns:1.35fr .65fr;
+  gap:14px
+}
+
+.card{
+  background:rgba(16,11,27,.9);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 15px 50px rgba(0,0,0,.12)
+}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:17px
+}
+
+.card-title{
+  font-size:16px;
+  font-weight:850;
+  letter-spacing:-.3px
+}
+
+.card-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px
+}
+
+.toolbar{
+  display:flex;
+  gap:9px;
+  align-items:center
+}
+
+.toolbar .search{
+  max-width:260px;
+  background:#141021;
+  color:var(--text)
+}
+
+.select-dark{
+  border:1px solid var(--line);
+  background:#141021;
+  color:#eee9f8;
+  border-radius:12px;
+  padding:11px 12px;
+  outline:none
+}
+
+/* LEADS */
+
+.leads{
+  display:flex;
+  flex-direction:column;
+  gap:10px
+}
+
+.lead{
+  border:1px solid var(--line);
+  background:linear-gradient(145deg,rgba(29,20,48,.72),rgba(15,10,25,.7));
+  border-radius:18px;
+  padding:15px;
+  transition:.2s
+}
+
+.lead:hover{
+  transform:translateY(-1px);
+  border-color:rgba(155,108,255,.28)
+}
+
+.lead-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+
+.lead-name{
+  font-weight:850;
+  font-size:14px
+}
+
+.lead-meta{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:5px
+}
+
+.temp{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:999px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:850
+}
+
+.temp.hot{
+  color:#ffb3bf;
+  background:rgba(255,107,129,.09);
+  border:1px solid rgba(255,107,129,.2)
+}
+
+.temp.warm{
+  color:#ffd98d;
+  background:rgba(255,200,87,.09);
+  border:1px solid rgba(255,200,87,.2)
+}
+
+.temp.cold{
+  color:#9fc9ff;
+  background:rgba(97,168,255,.09);
+  border:1px solid rgba(97,168,255,.2)
+}
+
+.temp.none{
+  color:#aaa2bd;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line)
+}
+
+.lead-mid{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px
+}
+
+.mini{
+  padding:7px 9px;
+  border-radius:9px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:10px;
+  color:#c9c2d7
+}
+
+.score{
+  font-weight:900;
+  color:#c09fff
+}
+
+.lead-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:12px
+}
+
+.btn{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+  color:#eee9f8;
+  background:rgba(255,255,255,.045);
+  font-size:10px;
+  font-weight:800
+}
+
+.btn:hover{
+  border-color:rgba(155,108,255,.4)
+}
+
+.btn-ai{
+  background:rgba(155,108,255,.12);
+  color:#d6beff
+}
+
+.btn-wa{
+  color:#8cf0bf
+}
+
+.btn-call{
+  color:#8dc5ff
+}
+
+.btn-visit{
+  color:#d1b9ff
+}
+
+.btn-follow{
+  color:#ffd98d
+}
+
+.status-select{
+  margin-left:auto;
+  border:1px solid var(--line);
+  background:#120c1f;
+  color:#eee9f8;
+  border-radius:9px;
+  padding:7px 8px;
+  font-size:10px
+}
+
+/* SIDEBAR */
+
+.side-stack{
+  display:flex;
+  flex-direction:column;
+  gap:14px
+}
+
+.upload-zone{
+  border:1px dashed rgba(155,108,255,.35);
+  border-radius:16px;
+  padding:18px;
+  background:rgba(155,108,255,.045)
+}
+
+.upload-zone h4{
+  margin:0 0 6px;
+  font-size:13px
+}
+
+.upload-zone p{
+  margin:0 0 13px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5
+}
+
+.upload-btn{
+  width:100%;
+  border:1px solid rgba(155,108,255,.25);
+  background:rgba(155,108,255,.1);
+  color:#d6beff;
+  border-radius:11px;
+  padding:11px;
+  font-weight:800;
+  font-size:11px
+}
+
+.config-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.config-grid .field{
+  margin:0
+}
+
+.config-grid .field input,
+.config-grid .field select{
+  background:#141021;
+  color:#f5f1ff
+}
+
+.pipeline{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px
+}
+
+.pipe{
+  background:#140e22;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px 7px;
+  text-align:center
+}
+
+.pipe b{
+  font-size:19px;
+  display:block
+}
+
+.pipe span{
+  font-size:8px;
+  color:#756d86;
+  letter-spacing:.06em
+}
+
+.empty{
+  padding:44px 15px;
+  text-align:center;
+  color:#766d87;
+  font-size:12px;
+  border:1px dashed var(--line);
+  border-radius:15px
+}
+
+.footer{
+  text-align:center;
+  color:#625a70;
+  font-size:10px;
+  padding-top:25px
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(4,2,8,.78);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:500
+}
+
+.modal.show{
+  display:flex
+}
+
+.modal-box{
+  width:min(100%,620px);
+  max-height:88vh;
+  overflow:auto;
+  background:#110b1d;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:var(--shadow)
+}
+
+.modal-title{
+  font-size:18px;
+  font-weight:900
+}
+
+.modal-text{
+  margin:13px 0;
+  padding:15px;
+  border-radius:15px;
+  background:#0b0711;
+  border:1px solid var(--line);
+  white-space:pre-wrap;
+  color:#ddd6e8;
+  font-size:12px;
+  line-height:1.55;
+  min-height:170px
+}
+
+.modal-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.close-btn{
+  margin-left:auto
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr)
+  }
+
+  .hero{
+    align-items:start;
+    flex-direction:column
+  }
+
+  .trial-pill{
+    white-space:normal
+  }
+
+  .toolbar{
+    flex-wrap:wrap
+  }
+
+  .toolbar .search{
+    max-width:none;
+    flex:1;
+    min-width:170px
+  }
+}
+
+@media(max-width:560px){
+
+  .topbar{
+    height:62px;
+    padding:0 13px
+  }
+
+  .user-chip{
+    display:none
+  }
+
+  .container{
+    width:min(100% - 20px,1220px);
+    padding-top:22px
+  }
+
+  .auth-card{
+    padding:24px;
+    border-radius:24px
+  }
+
+  .auth-card h1{
+    font-size:31px
+  }
+
+  .stats{
+    gap:8px
+  }
+
+  .stat{
+    padding:14px;
+    border-radius:16px
+  }
+
+  .stat-num{
+    font-size:24px
+  }
+
+  .card{
+    padding:15px;
+    border-radius:18px
+  }
+
+  .card-head{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .toolbar{
+    width:100%
+  }
+
+  .toolbar .search{
+    width:100%;
+    max-width:none
+  }
+
+  .select-dark{
+    width:100%
+  }
+
+  .lead-top{
+    align-items:flex-start
+  }
+
+  .status-select{
+    margin-left:0;
+    width:100%
+  }
+
+  .pipeline{
+    overflow:auto;
+    grid-template-columns:repeat(5,minmax(74px,1fr))
+  }
+
+  .config-grid{
+    grid-template-columns:1fr
+  }
+
+  .top-right .status{
+    font-size:0;
+    padding:8px
+  }
+
+  .top-right .status .dot{
+    margin:0
+  }
+
+  .logout{
+    font-size:10px;
+    padding:8px
+  }
+
+  .hero h2{
+    font-size:36px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="toast"></div>
+
+<!-- AUTH -->
+
+<section id="authView" class="auth-wrap">
+
+  <div class="auth-glow"></div>
+
+  <div class="auth-card">
+
+    <div class="auth-brand">
+      <span class="logo-mark">✦</span>
+      AutoLead AI
+    </div>
+
+    <h1 id="authTitle">Welcome back</h1>
+
+    <p id="authDesc" class="sub">
+      Sign in to your AutoLead AI workspace.
+    </p>
+
+    <div id="signupNameWrap" class="field hidden">
+      <label for="authName">Full name</label>
+      <input
+        id="authName"
+        type="text"
+        autocomplete="name"
+        placeholder="Your name"
+      >
+    </div>
+
+    <div class="field">
+      <label for="authEmail">Email</label>
+      <input
+        id="authEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="you@company.com"
+      >
+    </div>
+
+    <div class="field">
+      <label for="authPassword">Password</label>
+      <input
+        id="authPassword"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Minimum 8 characters"
+      >
+    </div>
+
+    <div id="forgotRow" class="auth-actions">
+      <button
+        id="forgotBtn"
+        class="link-btn"
+        type="button"
+      >
+        Forgot password?
+      </button>
+    </div>
+
+    <button
+      id="authBtn"
+      class="primary"
+      type="button"
+    >
+      Sign in
+    </button>
+
+    <button
+      id="switchBtn"
+      class="switch"
+      type="button"
+    >
+      Create an account
+    </button>
+
+    <div id="authMsg" class="auth-msg"></div>
+
+    <div class="auth-foot">
+      Real authorized lead data only.
+      No fake prospects or private-number scraping.
+    </div>
+
+  </div>
+</section>
+
+<!-- RESET PASSWORD -->
+
+<section id="resetView" class="auth-wrap hidden">
+
+  <div class="auth-glow"></div>
+
+  <div class="auth-card">
+
+    <div class="auth-brand">
+      <span class="logo-mark">✦</span>
+      AutoLead AI
+    </div>
+
+    <h1>Set new password</h1>
+
+    <p class="sub">
+      Choose a new password for your workspace.
+    </p>
+
+    <div class="field">
+      <label for="resetPassword">New password</label>
+      <input
+        id="resetPassword"
+        type="password"
+        autocomplete="new-password"
+        placeholder="Minimum 8 characters"
+      >
+    </div>
+
+    <div class="field">
+      <label for="resetPassword2">Confirm password</label>
+      <input
+        id="resetPassword2"
+        type="password"
+        autocomplete="new-password"
+        placeholder="Repeat password"
+      >
+    </div>
+
+    <button
+      id="resetBtn"
+      class="primary"
+      type="button"
+    >
+      Update password
+    </button>
+
+    <div id="resetMsg" class="auth-msg"></div>
+
+  </div>
+</section>
+
+<!-- APP -->
+
+<main id="appView" class="app hidden">
+
+  <nav class="topbar">
+
+    <div class="brand">
+      <span class="logo-mark">✦</span>
+      AutoLead AI
+    </div>
+
+    <div class="top-right">
+
+      <div id="healthBadge" class="status">
+        <span class="dot"></span>
+        <span>Checking system</span>
+      </div>
+
+      <div id="userChip" class="user-chip">
+        Workspace
+      </div>
+
+      <button
+        id="logoutBtn"
+        class="logout"
+        type="button"
+      >
+        Log out
+      </button>
+
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <header class="hero">
+
+      <div>
+
+        <div class="eyebrow">
+          REAL ESTATE SALES INTELLIGENCE
+        </div>
+
+        <h2>
+          Turn buyer interest into
+          <span>real conversations.</span>
+        </h2>
+
+        <p>
+          Bring authorized leads into one workspace,
+          qualify them with AI, and keep every follow-up organized.
+        </p>
+
+      </div>
+
+      <div id="trialPill" class="trial-pill">
+        Trial: checking…
+      </div>
+
+    </header>
+
+    <!-- STATS -->
+
+    <section class="stats">
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Total leads
+        </div>
+
+        <div id="totalStat" class="stat-num">
+          0
+        </div>
+
+        <div class="stat-note">
+          From your connected data
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Hot priority
+        </div>
+
+        <div id="hotStat" class="stat-num">
+          0
+        </div>
+
+        <div class="stat-note">
+          Highest AI temperature
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Site visits
+        </div>
+
+        <div id="visitStat" class="stat-num">
+          0
+        </div>
+
+        <div class="stat-note">
+          Current pipeline stage
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Pipeline value
+        </div>
+
+        <div id="valueStat" class="stat-num">
+          ₹0
+        </div>
+
+        <div class="stat-note">
+          Estimated from available budget data
+        </div>
+
+      </div>
+
+    </section>
+
+    <div class="grid">
+
+      <!-- LEADS -->
+
+      <section class="card">
+
+        <div class="card-head">
+
+          <div>
+
+            <div class="card-title">
+              Lead intelligence
+            </div>
+
+            <div class="card-sub">
+              Search, qualify and move genuine leads through your pipeline.
+            </div>
+
+          </div>
+
+          <div class="toolbar">
+
+            <input
+              id="searchBox"
+              class="search"
+              type="search"
+              placeholder="Search name, city, property…"
+            >
+
+            <select
+              id="filterStatus"
+              class="select-dark"
+            >
+              <option value="All">All stages</option>
+              <option>New</option>
+              <option>Qualified</option>
+              <option>Contacted</option>
+              <option>Interested</option>
+              <option>Site Visit</option>
+              <option>Negotiation</option>
+              <option>Booked</option>
+              <option>Converted</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <div id="leadsBox" class="leads">
+
+          <div class="empty">
+            Sign in to load your real leads.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- SIDEBAR -->
+
+      <aside class="side-stack">
+
+        <!-- PIPELINE -->
+
+        <section class="card">
+
+          <div class="card-head">
+
+            <div>
+
+              <div class="card-title">
+                Pipeline
+              </div>
+
+              <div class="card-sub">
+                Live status distribution
+              </div>
+
+            <script>
 "use strict";
 
 const API = "https://autolead-ai-v4.onrender.com";
@@ -928,4 +2200,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 window.refresh=refresh;
 window.closeAi=closeAi;
-</script>
+            </script>
