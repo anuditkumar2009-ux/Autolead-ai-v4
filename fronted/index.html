@@ -1,529 +1,632 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoLead AI — Master SaaS Dashboard</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            900: '#4c1d95',
-                            950: '#2e1065'
-                        }
-                    }
-                }
-            }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090014" />
+  <title>AutoLead AI — Real Estate Lead Intelligence</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#090014",
+            panel: "#11001f",
+            panel2: "#170329",
+            purplex: "#8b5cf6",
+            violetx: "#a855f7"
+          },
+          boxShadow: {
+            glow: "0 0 35px rgba(139,92,246,.20)"
+          }
         }
-    </script>
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(124,58,237,.15), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(168,85,247,.10), transparent 30%),
+        #090014;
+      color: #f5f3ff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #090014;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #4c1d95;
+      border-radius: 20px;
+    }
+
+    .glass {
+      background: rgba(17, 0, 31, .78);
+      border: 1px solid rgba(139, 92, 246, .18);
+      backdrop-filter: blur(16px);
+    }
+
+    .input {
+      width: 100%;
+      background: rgba(9, 0, 20, .9);
+      border: 1px solid rgba(139, 92, 246, .25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: white;
+      outline: none;
+      transition: .2s;
+    }
+
+    .input:focus {
+      border-color: rgba(167, 139, 250, .9);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, .12);
+    }
+
+    .btn {
+      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .modal-bg {
+      background: rgba(0, 0, 0, .72);
+      backdrop-filter: blur(8px);
+    }
+
+    .hidden-force {
+      display: none !important;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .table-scroll table {
+      min-width: 850px;
+    }
+  </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans flex flex-col">
 
-    <!-- TOP NAVBAR -->
-    <nav class="bg-purple-950/70 border-b border-purple-800/40 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl font-extrabold text-purple-400 tracking-wider">AutoLead <span class="text-white">AI</span></span>
-                <span id="backendStatus" class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                    Checking System...
-                </span>
-            </div>
-            <div id="navAuthArea" class="flex gap-2">
-                <button onclick="openModal('loginModal')" id="loginBtn" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition">Login</button>
-                <button onclick="openModal('signupModal')" id="signupBtn" class="px-4 py-1.5 bg-purple-900/60 hover:bg-purple-800 text-purple-200 text-xs font-semibold rounded-lg border border-purple-700/50 transition">Sign Up</button>
-                <button onclick="logout()" id="logoutBtn" class="hidden px-4 py-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition">Logout</button>
-            </div>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-40 border-b border-purple-900/30 bg-[#090014]/90 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-900 flex items-center justify-center shadow-glow shrink-0">
+          <span class="text-xl">✦</span>
         </div>
-    </nav>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
-
-        <!-- HIGHLIGHTED TRIAL BANNER (TOP) -->
-        <section class="bg-gradient-to-r from-purple-900/60 via-purple-950/80 to-purple-900/60 border border-purple-500/30 rounded-2xl p-5 backdrop-blur-md shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <div class="p-3 bg-purple-600/30 border border-purple-400/30 rounded-xl text-2xl">
-                    🚀
-                </div>
-                <div>
-                    <h3 class="text-xs font-semibold text-purple-300 uppercase tracking-wider">Active Subscription / Trial</h3>
-                    <p id="metricTrial" class="text-xl font-extrabold text-white">Checking Trial Status...</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs text-purple-300">₹5,000 First Purchase Offer</span>
-                <button onclick="alert('Payment Gateway integration coming soon!')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition">
-                    Upgrade Now
-                </button>
-            </div>
-        </section>
-
-        <!-- TOP METRICS GRID -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm shadow-md">
-                <p class="text-xs font-semibold text-purple-300 uppercase tracking-wider">Total Pipeline Leads</p>
-                <p id="metricTotalLeads" class="text-3xl font-extrabold text-white mt-2">0</p>
-            </div>
-            <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm shadow-md">
-                <p class="text-xs font-semibold text-red-400 uppercase tracking-wider">Hot Leads 🔥</p>
-                <p id="metricHotLeads" class="text-3xl font-extrabold text-white mt-2">0</p>
-            </div>
-            <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm shadow-md">
-                <p class="text-xs font-semibold text-yellow-400 uppercase tracking-wider">Warm Leads ☀️</p>
-                <p id="metricWarmLeads" class="text-3xl font-extrabold text-white mt-2">0</p>
-            </div>
-        </section>
-
-        <!-- CITY AUTO-COMPLETE SEARCH & CSV IMPORT SECTION -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- INDIAN CITIES SEARCH WITH DATALIST AUTO-SUGGEST -->
-            <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm relative">
-                <h3 class="text-sm font-bold text-white mb-1">Target Location Filter</h3>
-                <label class="block text-xs text-gray-400 mb-2">Type 2 letters to search Indian cities:</label>
-                <input 
-                    type="text" 
-                    id="cityInput" 
-                    list="indianCities" 
-                    placeholder="Search city (e.g. Delhi, Mumbai, Noida)..." 
-                    class="w-full bg-purple-900/20 border border-purple-800/60 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition"
-                >
-                <datalist id="indianCities">
-                    <option value="Delhi NCR"><option value="Mumbai"><option value="Bengaluru"><option value="Hyderabad">
-                    <option value="Pune"><option value="Ahmedabad"><option value="Kolkata"><option value="Chennai">
-                    <option value="Noida"><option value="Gurugram"><option value="Lucknow"><option value="Jaipur">
-                    <option value="Chandigarh"><option value="Indore"><option value="Surat"><option value="Kochi">
-                    <option value="Dehradun"><option value="Thane"><option value="Navi Mumbai"><option value="Ghaziabad">
-                    <option value="Varanasi"><option value="Agra"><option value="Kanpur"><option value="Patna">
-                </datalist>
-            </div>
-                        <!-- CSV IMPORT SECTION -->
-            <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm">
-                <h3 class="text-sm font-bold text-white mb-1">Import Authorized CSV</h3>
-                <p class="text-xs text-gray-400 mb-3">Upload your existing real estate leads list.</p>
-                <form id="csvForm" class="flex items-center gap-2">
-                    <input type="file" id="csvFile" accept=".csv" required class="w-full text-xs text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
-                    <button type="submit" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs rounded-lg transition whitespace-nowrap">Upload</button>
-                </form>
-            </div>
-        </section>
-
-        <!-- PIPELINE LEADS TABLE -->
-        <section class="bg-purple-950/30 border border-purple-900/40 rounded-xl overflow-hidden shadow-2xl">
-            <div class="p-4 border-b border-purple-900/40 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-white">Live Pipeline Leads</h2>
-                <div class="flex items-center gap-2">
-                    <button onclick="openModal('campaignModal')" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold transition">+ New Campaign</button>
-                    <button onclick="fetchLeads()" class="text-xs bg-purple-900/50 hover:bg-purple-800 text-purple-200 px-3 py-1.5 rounded-lg border border-purple-700/50 transition">↻ Refresh Data</button>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-purple-950/80 text-purple-300 uppercase text-xs font-semibold border-b border-purple-900/50">
-                        <tr>
-                            <th class="py-3 px-4">Name</th>
-                            <th class="py-3 px-4">Phone</th>
-                            <th class="py-3 px-4">Source</th>
-                            <th class="py-3 px-4">AI Score</th>
-                            <th class="py-3 px-4">Status</th>
-                            <th class="py-3 px-4">Actions & Analysis</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadsTableBody">
-                        <tr>
-                            <td colspan="6" class="text-center py-6 text-gray-400">Loading leads...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- AUTH MODAL: LOGIN -->
-    <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-4">Agent Login</h2>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Email Address</label>
-                    <input type="email" id="loginEmail" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Password</label>
-                    <input type="password" id="loginPassword" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div class="flex justify-between items-center text-xs">
-                    <a href="#" onclick="switchModal('loginModal', 'forgotModal')" class="text-purple-400 hover:underline">Forgot Password?</a>
-                </div>
-                <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition">Login</button>
-            </form>
-            <p class="text-xs text-gray-400 mt-4 text-center">Don't have an account? <a href="#" onclick="switchModal('loginModal', 'signupModal')" class="text-purple-400 underline">Sign Up</a></p>
+        <div class="min-w-0">
+          <div class="font-black tracking-tight truncate">AutoLead AI</div>
+          <div class="text-[10px] text-purple-300/60 uppercase tracking-[.18em]">
+            Real Estate Intelligence
+          </div>
         </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div id="backendStatus"
+             class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-500/20 bg-purple-950/30 text-xs text-purple-200">
+          <span id="statusDot" class="status-dot bg-gray-500"></span>
+          <span id="statusText">Checking...</span>
+        </div>
+
+        <button id="loginNavBtn"
+                onclick="openModal('loginModal')"
+                class="btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-purple-950/50">
+          Login
+        </button>
+
+        <button id="signupNavBtn"
+                onclick="openModal('signupModal')"
+                class="btn px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-violet-600 to-purple-600 shadow-glow">
+          Sign Up
+        </button>
+
+        <button id="logoutBtn"
+                onclick="logout()"
+                class="hidden btn px-3 py-2 rounded-xl text-sm font-semibold border border-purple-500/20 hover:bg-purple-950/50">
+          Logout
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- AUTH MODAL: SIGNUP -->
-    <div id="signupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal('signupModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-4">Create Agent Account</h2>
-            <form id="signupForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Full Name</label>
-                    <input type="text" id="signupName" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Email Address</label>
-                    <input type="email" id="signupEmail" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Password</label>
-                    <input type="password" id="signupPassword" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition">Create Account</button>
-            </form>
-            <p class="text-xs text-gray-400 mt-4 text-center">Already registered? <a href="#" onclick="switchModal('signupModal', 'loginModal')" class="text-purple-400 underline">Login</a></p>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+
+    <!-- HERO -->
+    <section class="grid lg:grid-cols-[1.5fr_.8fr] gap-5 mb-6">
+
+      <div class="glass rounded-3xl p-6 md:p-8 shadow-glow overflow-hidden relative">
+        <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-violet-600/10 blur-3xl"></div>
+
+        <div class="relative">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/20 bg-violet-950/30 text-xs text-violet-200 mb-5">
+            <span class="status-dot bg-emerald-400"></span>
+            Production Lead Intelligence
+          </div>
+
+          <h1 class="text-3xl md:text-5xl font-black leading-tight tracking-tight">
+            Turn your authorized real-estate leads into
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-fuchsia-400">
+              qualified business
+            </span>.
+          </h1>
+
+          <p class="mt-4 text-sm md:text-base text-purple-200/65 max-w-2xl leading-7">
+            Import or connect leads you are authorized to use, understand buyer intent
+            with AI, manage your pipeline and act faster from one workspace.
+          </p>
+
+          <div class="flex flex-wrap gap-3 mt-6">
+            <button onclick="openCampaignModal()"
+                    class="btn px-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 font-bold shadow-glow">
+              + New Campaign
+            </button>
+
+            <button onclick="document.getElementById('csvFile').click()"
+                    class="btn px-5 py-3 rounded-xl border border-purple-500/25 bg-purple-950/20 font-semibold">
+              Import Authorized CSV
+            </button>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- AUTH MODAL: FORGOT PASSWORD -->
-    <div id="forgotModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal('forgotModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-2">Reset Password</h2>
-            <p class="text-xs text-gray-400 mb-4">Enter your registered email to receive reset link.</p>
-            <form id="forgotForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Email Address</label>
-                    <input type="email" id="forgotEmail" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition">Send Reset Link</button>
-            </form>
-            <p class="text-xs text-gray-400 mt-4 text-center">Remembered? <a href="#" onclick="switchModal('forgotModal', 'loginModal')" class="text-purple-400 underline">Back to Login</a></p>
+
+      <!-- TRIAL / OFFER -->
+      <div class="glass rounded-3xl p-6 border border-violet-500/20">
+        <div class="text-xs uppercase tracking-[.2em] text-violet-300/60">
+          Current Access
         </div>
-    </div>
 
-    <!-- CAMPAIGN FORM MODAL -->
-    <div id="campaignModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal('campaignModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-4">Launch Buyer Acquisition Campaign</h2>
-            <form id="campaignForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-300 mb-1">Campaign Name</label>
-                    <input type="text" id="campName" placeholder="e.g. Luxury Villas Phase 1" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-gray-300 mb-1">Property Type</label>
-                        <select id="campPropType" class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                            <option value="Residential">Residential Apartment</option>
-                            <option value="Villa">Luxury Villa</option>
-                            <option value="Plot">Commercial Plot</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-300 mb-1">Budget Range</label>
-                        <select id="campBudget" class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
-                            <option value="50L-1Cr">₹50 Lakhs - ₹1 Cr</option>
-                            <option value="1Cr-3Cr">₹1 Cr - ₹3 Cr</option>
-                            <option value="3Cr+">₹3 Cr+</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-lg transition">Create & Launch Campaign</button>
-            </form>
+        <div id="trialTitle" class="text-2xl font-black mt-2">
+          Sign in to start
         </div>
-    </div>
 
-    <!-- AI SUMMARY MODAL -->
-    <div id="aiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal('aiModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-2">Gemini AI Qualification Detailed View</h2>
-            <div id="aiModalContent" class="text-sm text-gray-300 space-y-3 my-4 bg-purple-900/20 p-4 rounded-xl border border-purple-800/40">
-                Loading AI Analysis...
-            </div>
-            <button onclick="closeModal('aiModal')" class="w-full py-2 bg-purple-900/50 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg transition">Close</button>
+        <div id="trialDetails" class="text-sm text-purple-200/60 mt-2 leading-6">
+          Your account status and remaining trial usage will appear here.
         </div>
+
+        <div class="mt-5 p-4 rounded-2xl bg-gradient-to-br from-violet-950/70 to-purple-950/30 border border-violet-500/15">
+          <div class="text-xs text-purple-300/60 uppercase tracking-wider">
+            Introductory offer
+          </div>
+
+          <div class="flex items-end gap-2 mt-1">
+            <span class="text-3xl font-black">₹5,000</span>
+            <span class="text-sm text-purple-300/50 mb-1">first purchase</span>
+          </div>
+
+          <div class="text-sm text-purple-200/60 mt-1">
+            Then ₹10,000/month
+          </div>
+
+          <button onclick="showPaymentStatus()"
+                  class="btn mt-4 w-full py-2.5 rounded-xl border border-violet-400/20 bg-violet-600/10 font-semibold">
+            Upgrade
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- METRICS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+
+      <div class="glass rounded-2xl p-4">
+        <div class="text-xs text-purple-300/50 uppercase">Pipeline Leads</div>
+        <div id="metricTotal" class="text-3xl font-black mt-1">0</div>
+      </div>
+
+      <div class="glass rounded-2xl p-4">
+        <div class="text-xs text-purple-300/50 uppercase">Hot</div>
+        <div id="metricHot" class="text-3xl font-black mt-1 text-red-300">0</div>
+      </div>
+
+      <div class="glass rounded-2xl p-4">
+        <div class="text-xs text-purple-300/50 uppercase">Warm</div>
+        <div id="metricWarm" class="text-3xl font-black mt-1 text-amber-300">0</div>
+      </div>
+
+      <div class="glass rounded-2xl p-4">
+        <div class="text-xs text-purple-300/50 uppercase">Booked</div>
+        <div id="metricBooked" class="text-3xl font-black mt-1 text-emerald-300">0</div>
+      </div>
+    </section>
+
+
+    <!-- AUTHORIZED LEAD DISCOVERY -->
+    <section class="glass rounded-3xl p-5 md:p-6 mb-6 border border-violet-500/15">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">⚡</span>
+            <h2 class="text-xl font-black">Automatic Lead Discovery</h2>
+          </div>
+
+          <p class="text-sm text-purple-200/60 mt-2 max-w-3xl leading-6">
+            AutoLead AI can be connected to an authorized lead source such as your
+            CRM, Meta Lead Ads, Google lead forms or another approved webhook.
+            It does not scrape private phone numbers or invent prospects.
+          </p>
+        </div>
+
+        <button onclick="openSourceModal()"
+                class="btn shrink-0 px-5 py-3 rounded-xl bg-violet-600/15 border border-violet-400/20 font-bold">
+          Connect Source
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3 mt-5">
+
+        <div class="rounded-2xl p-4 bg-black/20 border border-purple-500/10">
+          <div class="font-bold text-sm">CRM</div>
+          <div class="text-xs text-purple-200/50 mt-1">
+            Connect an authorized CRM feed.
+          </div>
+        </div>
+
+        <div class="rounded-2xl p-4 bg-black/20 border border-purple-500/10">
+          <div class="font-bold text-sm">Lead Ads</div>
+          <div class="text-xs text-purple-200/50 mt-1">
+            Receive leads from your authorized advertising account.
+          </div>
+        </div>
+
+        <div class="rounded-2xl p-4 bg-black/20 border border-purple-500/10">
+          <div class="font-bold text-sm">Webhook</div>
+          <div class="text-xs text-purple-200/50 mt-1">
+            Send authorized lead events to your backend integration.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- FILTER / IMPORT -->
+    <section class="glass rounded-3xl p-5 md:p-6 mb-6">
+
+      <div class="flex flex-col lg:flex-row lg:items-end gap-4">
+
+        <div class="flex-1">
+          <label class="text-xs text-purple-300/60 uppercase tracking-wider">
+            Search / Location
+          </label>
+
+          <input id="searchInput"
+                 class="input mt-2"
+                 placeholder="Search lead name, email, phone or location..."
+                 oninput="applyFilters()" />
+        </div>
+
+        <div class="w-full lg:w-56">
+          <label class="text-xs text-purple-300/60 uppercase tracking-wider">
+            Temperature
+          </label>
+
+          <select id="temperatureFilter"
+                  class="input mt-2"
+                  onchange="applyFilters()">
+            <option value="">All</option>
+            <option value="Hot">Hot</option>
+            <option value="Warm">Warm</option>
+            <option value="Cold">Cold</option>
+          </select>
+        </div>
+
+        <div class="w-full lg:w-56">
+          <label class="text-xs text-purple-300/60 uppercase tracking-wider">
+            Status
+          </label>
+
+          <select id="statusFilter"
+                  class="input mt-2"
+                  onchange="applyFilters()">
+            <option value="">All</option>
+            <option>New</option>
+            <option>Qualified</option>
+            <option>Interested</option>
+            <option>Contacted</option>
+            <option>Site Visit</option>
+            <option>Negotiation</option>
+            <option>Booked</option>
+            <option>Converted</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="clearFilters()"
+                  class="btn px-4 py-3 rounded-xl border border-purple-500/20 bg-purple-950/20 font-semibold">
+            Clear
+          </button>
+
+          <button onclick="loadLeads()"
+                  class="btn px-4 py-3 rounded-xl bg-purple-600/20 border border-purple-400/20 font-semibold">
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <input id="csvFile"
+             type="file"
+             accept=".csv,text/csv"
+             class="hidden"
+             onchange="importCSV()" />
+    </section>
+
+
+    <!-- PIPELINE -->
+    <section class="glass rounded-3xl overflow-hidden">
+
+      <div class="p-5 md:p-6 border-b border-purple-500/10 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+        <div>
+          <h2 class="text-xl font-black">Live Pipeline</h2>
+          <p class="text-sm text-purple-200/50 mt-1">
+            Only authorized leads loaded from your account are shown.
+          </p>
+        </div>
+
+        <button onclick="exportCSV()"
+                class="btn px-4 py-2.5 rounded-xl border border-purple-500/20 bg-purple-950/20 font-semibold text-sm">
+          Export CSV
+        </button>
+      </div>
+
+      <div id="loadingState" class="hidden p-10 text-center text-purple-200/50">
+        Loading your leads...
+      </div>
+
+      <div id="emptyState" class="hidden p-10 text-center">
+        <div class="text-4xl mb-3">◌</div>
+        <div class="font-bold">No authorized leads found</div>
+        <div class="text-sm text-purple-200/50 mt-2">
+          Import an authorized CSV or connect an approved lead source.
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="w-full text-left">
+          <thead class="bg-purple-950/25 text-xs uppercase text-purple-300/50">
+            <tr>
+              <th class="px-5 py-4">Lead</th>
+              <th class="px-5 py-4">Location</th>
+              <th class="px-5 py-4">AI</th>
+              <th class="px-5 py-4">Status</th>
+              <th class="px-5 py-4">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="leadTableBody" class="divide-y divide-purple-500/10"></tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- FOOTER INFO -->
+    <section class="mt-6 grid md:grid-cols-3 gap-3">
+
+      <div class="glass rounded-2xl p-5">
+        <div class="font-bold">Real Data Only</div>
+        <p class="text-xs text-purple-200/50 mt-2 leading-5">
+          No fake prospects, fake scores or simulated conversion results.
+        </p>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="font-bold">AI Intelligence</div>
+        <p class="text-xs text-purple-200/50 mt-2 leading-5">
+          AI analysis is requested from the connected backend service.
+        </p>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="font-bold">Authorized Outreach</div>
+        <p class="text-xs text-purple-200/50 mt-2 leading-5">
+          Use lead data only where you have the appropriate authorization and lawful basis.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal"
+       class="hidden fixed inset-0 z-50 modal-bg items-center justify-center p-4">
+
+    <div class="glass rounded-3xl w-full max-w-md p-6 shadow-2xl">
+
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-black">Welcome back</h2>
+        <button onclick="closeModal('loginModal')" class="text-purple-300/50 text-xl">×</button>
+      </div>
+
+      <p class="text-sm text-purple-200/50 mt-2">
+        Sign in to your AutoLead AI workspace.
+      </p>
+
+      <form id="loginForm" class="mt-5 space-y-3">
+
+        <input id="loginEmail"
+               class="input"
+               type="email"
+               placeholder="Email"
+               required />
+
+        <input id="loginPassword"
+               class="input"
+               type="password"
+               placeholder="Password"
+               required />
+
+        <button id="loginSubmit"
+                class="btn w-full py-3 rounded-xl bg-violet-600 font-bold">
+          Login
+        </button>
+      </form>
+
+      <button onclick="closeModal('loginModal'); openModal('forgotModal')"
+              class="text-sm text-violet-300 mt-4 hover:text-violet-200">
+        Forgot password?
+      </button>
     </div>
+  </div>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-purple-900/30 py-4 text-center text-xs text-gray-500">
-        AutoLead AI &copy; 2026 — Real-Estate AI Qualification System
-                        </footer>
-          <!-- MAIN JAVASCRIPT LOGIC -->
-    <script>
-        const API_BASE = "https://autolead-ai-v4.onrender.com";
-        let globalLeads = [];
 
-        // 1. SYSTEM HEALTH CHECK
-        async function checkHealth() {
-            const statusEl = document.getElementById('backendStatus');
-            try {
-                const res = await fetch(`${API_BASE}/api/health`);
-                const data = await res.json();
-                if (data.status === 'healthy' && data.database === 'connected') {
-                    statusEl.className = "px-3 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30";
-                    statusEl.innerText = "System Live ✅";
-                } else {
-                    throw new Error("Degraded");
-                }
-            } catch (err) {
-                statusEl.className = "px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30";
-                statusEl.innerText = "Backend Offline ❌";
-            }
-        }
+  <!-- SIGNUP MODAL -->
+  <div id="signupModal"
+       class="hidden fixed inset-0 z-50 modal-bg items-center justify-center p-4">
 
-        // 2. FETCH PIPELINE LEADS
-        async function fetchLeads() {
-            const token = localStorage.getItem('token');
-            const tableBody = document.getElementById('leadsTableBody');
+    <div class="glass rounded-3xl w-full max-w-md p-6 shadow-2xl">
 
-            if (!token) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-yellow-400">Please Login or Sign Up to manage leads.</td></tr>`;
-                document.getElementById('logoutBtn').classList.add('hidden');
-                document.getElementById('loginBtn').classList.remove('hidden');
-                document.getElementById('signupBtn').classList.remove('hidden');
-                document.getElementById('metricTrial').innerText = "Login Required";
-                return;
-            }
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-black">Create account</h2>
+        <button onclick="closeModal('signupModal')" class="text-purple-300/50 text-xl">×</button>
+      </div>
 
-            document.getElementById('logoutBtn').classList.remove('hidden');
-            document.getElementById('loginBtn').classList.add('hidden');
-            document.getElementById('signupBtn').classList.add('hidden');
+      <p class="text-sm text-purple-200/50 mt-2">
+        Start with your server-enforced trial.
+      </p>
 
-            try {
-                const res = await fetch(`${API_BASE}/api/leads`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+      <form id="signupForm" class="mt-5 space-y-3">
 
-                if (res.status === 401) {
-                    logout();
-                    return;
-                }
+        <input id="signupName"
+               class="input"
+               type="text"
+               placeholder="Full name"
+               required />
 
-                globalLeads = await res.json();
-                renderLeads(globalLeads);
-                updateMetrics(globalLeads);
-            } catch (err) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-400">Failed to load leads from backend.</td></tr>`;
-            }
-        }
+        <input id="signupEmail"
+               class="input"
+               type="email"
+               placeholder="Email"
+               required />
 
-        // 3. RENDER LEADS TABLE
-        function renderLeads(leadsArray) {
-            const tableBody = document.getElementById('leadsTableBody');
-            if (!tableBody) return;
+        <input id="signupPassword"
+               class="input"
+               type="password"
+               minlength="8"
+               placeholder="Password — minimum 8 characters"
+               required />
 
-            if (!Array.isArray(leadsArray) || leadsArray.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No leads available. Upload CSV or create a campaign.</td></tr>`;
-                return;
-            }
+        <button id="signupSubmit"
+                class="btn w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 font-bold">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </div>
 
-            tableBody.innerHTML = leadsArray.map(lead => {
-                let aiBadgeClass = 'bg-gray-700 text-gray-300';
-                if (lead.ai_score === 'Hot') aiBadgeClass = 'bg-red-500/20 text-red-400 border border-red-500/30';
-                else if (lead.ai_score === 'Warm') aiBadgeClass = 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
-                else if (lead.ai_score === 'Cold') aiBadgeClass = 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
 
-                const cleanPhone = lead.phone ? lead.phone.replace(/\D/g, '') : '';
-                const waLink = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Namaste ${lead.full_name}, AutoLead AI ki taraf se aapka swagat hai.`)}`;
+  <!-- FORGOT MODAL -->
+  <div id="forgotModal"
+       class="hidden fixed inset-0 z-50 modal-bg items-center justify-center p-4">
 
-                return `
-                    <tr class="border-b border-purple-900/30 hover:bg-purple-900/10 transition">
-                        <td class="py-3 px-4 font-medium text-white">${escapeHtml(lead.full_name)}</td>
-                        <td class="py-3 px-4 text-gray-300">${escapeHtml(lead.phone)}</td>
-                        <td class="py-3 px-4 text-gray-300">${escapeHtml(lead.source || 'Meta Ads')}</td>
-                        <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${aiBadgeClass}">
-                                ${lead.ai_score ? lead.ai_score : 'Analyzing...'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4">
-                            <select onchange="updateLeadStatus(${lead.id}, this.value)" class="bg-purple-900/40 border border-purple-800 text-xs text-gray-200 rounded px-2 py-1">
-                                <option value="New" ${lead.status === 'New' ? 'selected' : ''}>New</option>
-                                <option value="Qualified" ${lead.status === 'Qualified' ? 'selected' : ''}>Qualified</option>
-                                <option value="Contacted" ${lead.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-                                <option value="Site Visit" ${lead.status === 'Site Visit' ? 'selected' : ''}>Site Visit</option>
-                                <option value="Negotiation" ${lead.status === 'Negotiation' ? 'selected' : ''}>Negotiation</option>
-                                <option value="Booked" ${lead.status === 'Booked' ? 'selected' : ''}>Booked</option>
-                            </select>
-                        </td>
-                        <td class="py-3 px-4 flex gap-2">
-                            <a href="${waLink}" target="_blank" class="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition">💬 WA</a>
-                            <a href="tel:${lead.phone}" class="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition">📞 Call</a>
-                            <button onclick="viewAiAnalysis(${lead.id})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition">🤖 AI Report</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    <div class="glass rounded-3xl w-full max-w-md p-6">
 
-        // 4. UPDATE LEAD STATUS
-        async function updateLeadStatus(leadId, newStatus) {
-            const token = localStorage.getItem('token');
-            try {
-                await fetch(`${API_BASE}/api/leads/${leadId}/status`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ status: newStatus })
-                });
-            } catch (err) {
-                alert('Status update failed');
-            }
-        }
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-black">Reset password</h2>
+        <button onclick="closeModal('forgotModal')" class="text-purple-300/50 text-xl">×</button>
+      </div>
 
-        // 5. VIEW AI ANALYSIS MODAL
-        function viewAiAnalysis(leadId) {
-            const lead = globalLeads.find(l => l.id === leadId);
-            if (!lead) return;
-            document.getElementById('aiModalContent').innerHTML = `
-                <p><strong>Name:</strong> ${escapeHtml(lead.full_name)}</p>
-                <p><strong>AI Score:</strong> ${escapeHtml(lead.ai_score || 'N/A')}</p>
-                <p><strong>AI Summary:</strong> ${escapeHtml(lead.ai_summary || 'No AI summary generated yet.')}</p>
-            `;
-            openModal('aiModal');
-        }
+      <p class="text-sm text-purple-200/50 mt-2">
+        Enter your account email. If email delivery is configured, a reset message will be sent.
+      </p>
 
-        // 6. METRICS & TRIAL UPDATE
-        function updateMetrics(leads) {
-            if (!Array.isArray(leads)) return;
-            document.getElementById('metricTotalLeads').innerText = leads.length;
-            document.getElementById('metricHotLeads').innerText = leads.filter(l => l.ai_score === 'Hot').length;
-            document.getElementById('metricWarmLeads').innerText = leads.filter(l => l.ai_score === 'Warm').length;
-            
-            const leadsLeft = Math.max(0, 10 - leads.length);
-            document.getElementById('metricTrial').innerText = `${leadsLeft} Free Leads Left (7-Day Trial Active)`;
-        }
+      <form id="forgotForm" class="mt-5 space-y-3">
 
-        // 7. MODAL CONTROLLERS
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function switchModal(fromId, toId) { closeModal(fromId); openModal(toId); }
+        <input id="forgotEmail"
+               class="input"
+               type="email"
+               placeholder="Account email"
+               required />
 
-        // 8. AUTH FORM HANDLERS
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                const res = await fetch(`${API_BASE}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: document.getElementById('loginEmail').value,
-                        password: document.getElementById('loginPassword').value
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    localStorage.setItem('token', data.token);
-                    closeModal('loginModal');
-                    fetchLeads();
-                } else {
-                    alert(data.error || 'Login failed');
-                }
-            } catch (err) { alert('Login request failed'); }
-        });
+        <button id="forgotSubmit"
+                class="btn w-full py-3 rounded-xl bg-violet-600 font-bold">
+          Send Reset Request
+        </button>
+      </form>
+    </div>
+  </div>
 
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                const res = await fetch(`${API_BASE}/api/auth/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        full_name: document.getElementById('signupName').value,
-                        email: document.getElementById('signupEmail').value,
-                        password: document.getElementById('signupPassword').value
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    localStorage.setItem('token', data.token);
-                    closeModal('signupModal');
-                    fetchLeads();
-                } else {
-                    alert(data.error || 'Signup failed');
-                }
-            } catch (err) { alert('Signup request failed'); }
-        });
 
-        document.getElementById('forgotForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Password reset link has been sent to your email.');
-            closeModal('forgotModal');
-        });
+  <!-- CAMPAIGN MODAL -->
+  <div id="campaignModal"
+       class="hidden fixed inset-0 z-50 modal-bg items-center justify-center p-4">
 
-        // 9. CAMPAIGN FORM HANDLER
-        document.getElementById('campaignForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Campaign launched successfully!');
-            closeModal('campaignModal');
-        });
+    <div class="glass rounded-3xl w-full max-w-lg p-6">
 
-        // 10. CSV UPLOAD HANDLER
-        document.getElementById('csvForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = localStorage.getItem('token');
-            const fileInput = document.getElementById('csvFile');
-            if (!token) { alert('Please login first!'); return; }
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-black">New Campaign</h2>
+        <button onclick="closeModal('campaignModal')" class="text-purple-300/50 text-xl">×</button>
+      </div>
 
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
+      <p class="text-sm text-purple-200/50 mt-2">
+        Configure your campaign strategy. Campaign execution is enabled only through
+        supported backend integrations.
+      </p>
 
-            try {
-                const res = await fetch(`${API_BASE}/api/leads/upload-csv`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                if (res.ok) {
-                    alert('CSV Imported successfully!');
-                    fetchLeads();
-                } else {
-                    alert('Upload failed');
-                }
-            } catch (err) { alert('Upload request failed.'); }
-        });
+      <div class="space-y-3 mt-5">
 
-        // 11. CITY SEARCH FILTER LOGIC
-        document.getElementById('cityInput').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (query.length < 2) {
-                renderLeads(globalLeads);
-                return;
-            }
-            const filtered = globalLeads.filter(lead => 
-                (lead.city && lead.city.toLowerCase().includes(query)) ||
-                (lead.full_name && lead.full_name.toLowerCase().includes(query))
-            );
-            renderLeads(filtered);
-        });
+        <input id="campaignName"
+               class="input"
+               placeholder="Campaign name" />
 
-        // 12. HELPER UTILS
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-        }
+        <input id="campaignLocation"
+               class="input"
+               placeholder="Target location e.g. Lucknow" />
 
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.reload();
-        }
+        <select id="campaignOffer" class="input">
+          <option>Residential Property Follow-up</option>
+          <option>Site Visit Conversion</option>
+          <option>High Intent Buyer Follow-up</option>
+          <option>Investor Lead Follow-up</option>
+          <option>Broker / Channel Partner Outreach</option>
+        </select>
 
-        // INIT ON LOAD
-        window.addEventListener('DOMContentLoaded', () => {
-            checkHealth();
-            fetchLeads();
-        });
-    </script>
-</body>
-</html>
+        <select i
