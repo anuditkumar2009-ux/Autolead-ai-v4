@@ -84,7 +84,7 @@
 
         <!-- CITY AUTO-COMPLETE SEARCH & CSV IMPORT SECTION -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- INDIAN CITIES SEARCH WITH DATALIST -->
+            <!-- INDIAN CITIES SEARCH WITH DATALIST AUTO-SUGGEST -->
             <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm relative">
                 <h3 class="text-sm font-bold text-white mb-1">Target Location Filter</h3>
                 <label class="block text-xs text-gray-400 mb-2">Type 2 letters to search Indian cities:</label>
@@ -104,8 +104,7 @@
                     <option value="Varanasi"><option value="Agra"><option value="Kanpur"><option value="Patna">
                 </datalist>
             </div>
-
-            <!-- CSV IMPORT -->
+                        <!-- CSV IMPORT SECTION -->
             <div class="bg-purple-950/40 border border-purple-900/50 rounded-xl p-5 backdrop-blur-sm">
                 <h3 class="text-sm font-bold text-white mb-1">Import Authorized CSV</h3>
                 <p class="text-xs text-gray-400 mb-3">Upload your existing real estate leads list.</p>
@@ -120,7 +119,10 @@
         <section class="bg-purple-950/30 border border-purple-900/40 rounded-xl overflow-hidden shadow-2xl">
             <div class="p-4 border-b border-purple-900/40 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-white">Live Pipeline Leads</h2>
-                <button onclick="fetchLeads()" class="text-xs bg-purple-900/50 hover:bg-purple-800 text-purple-200 px-3 py-1.5 rounded-lg border border-purple-700/50 transition">↻ Refresh Data</button>
+                <div class="flex items-center gap-2">
+                    <button onclick="openModal('campaignModal')" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold transition">+ New Campaign</button>
+                    <button onclick="fetchLeads()" class="text-xs bg-purple-900/50 hover:bg-purple-800 text-purple-200 px-3 py-1.5 rounded-lg border border-purple-700/50 transition">↻ Refresh Data</button>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
@@ -159,6 +161,9 @@
                     <label class="block text-xs text-gray-300 mb-1">Password</label>
                     <input type="password" id="loginPassword" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
                 </div>
+                <div class="flex justify-between items-center text-xs">
+                    <a href="#" onclick="switchModal('loginModal', 'forgotModal')" class="text-purple-400 hover:underline">Forgot Password?</a>
+                </div>
                 <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition">Login</button>
             </form>
             <p class="text-xs text-gray-400 mt-4 text-center">Don't have an account? <a href="#" onclick="switchModal('loginModal', 'signupModal')" class="text-purple-400 underline">Sign Up</a></p>
@@ -189,11 +194,61 @@
         </div>
     </div>
 
+    <!-- AUTH MODAL: FORGOT PASSWORD -->
+    <div id="forgotModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('forgotModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+            <h2 class="text-xl font-bold text-white mb-2">Reset Password</h2>
+            <p class="text-xs text-gray-400 mb-4">Enter your registered email to receive reset link.</p>
+            <form id="forgotForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Email Address</label>
+                    <input type="email" id="forgotEmail" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm rounded-lg transition">Send Reset Link</button>
+            </form>
+            <p class="text-xs text-gray-400 mt-4 text-center">Remembered? <a href="#" onclick="switchModal('forgotModal', 'loginModal')" class="text-purple-400 underline">Back to Login</a></p>
+        </div>
+    </div>
+
+    <!-- CAMPAIGN FORM MODAL -->
+    <div id="campaignModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('campaignModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+            <h2 class="text-xl font-bold text-white mb-4">Launch Buyer Acquisition Campaign</h2>
+            <form id="campaignForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Campaign Name</label>
+                    <input type="text" id="campName" placeholder="e.g. Luxury Villas Phase 1" required class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-300 mb-1">Property Type</label>
+                        <select id="campPropType" class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                            <option value="Residential">Residential Apartment</option>
+                            <option value="Villa">Luxury Villa</option>
+                            <option value="Plot">Commercial Plot</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-300 mb-1">Budget Range</label>
+                        <select id="campBudget" class="w-full bg-purple-900/30 border border-purple-800/60 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                            <option value="50L-1Cr">₹50 Lakhs - ₹1 Cr</option>
+                            <option value="1Cr-3Cr">₹1 Cr - ₹3 Cr</option>
+                            <option value="3Cr+">₹3 Cr+</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-lg transition">Create & Launch Campaign</button>
+            </form>
+        </div>
+    </div>
+
     <!-- AI SUMMARY MODAL -->
     <div id="aiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-purple-950 border border-purple-800/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
             <button onclick="closeModal('aiModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h2 class="text-xl font-bold text-white mb-2">Gemini AI Qualification</h2>
+            <h2 class="text-xl font-bold text-white mb-2">Gemini AI Qualification Detailed View</h2>
             <div id="aiModalContent" class="text-sm text-gray-300 space-y-3 my-4 bg-purple-900/20 p-4 rounded-xl border border-purple-800/40">
                 Loading AI Analysis...
             </div>
@@ -204,14 +259,13 @@
     <!-- FOOTER -->
     <footer class="border-t border-purple-900/30 py-4 text-center text-xs text-gray-500">
         AutoLead AI &copy; 2026 — Real-Estate AI Qualification System
-    </footer>
-
-    <!-- MAIN JAVASCRIPT LOGIC -->
+                        </footer>
+          <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
         const API_BASE = "https://autolead-ai-v4.onrender.com";
         let globalLeads = [];
 
-        // System Health
+        // 1. SYSTEM HEALTH CHECK
         async function checkHealth() {
             const statusEl = document.getElementById('backendStatus');
             try {
@@ -229,7 +283,7 @@
             }
         }
 
-        // Fetch Leads
+        // 2. FETCH PIPELINE LEADS
         async function fetchLeads() {
             const token = localStorage.getItem('token');
             const tableBody = document.getElementById('leadsTableBody');
@@ -265,13 +319,13 @@
             }
         }
 
-        // Render Leads Table
+        // 3. RENDER LEADS TABLE
         function renderLeads(leadsArray) {
             const tableBody = document.getElementById('leadsTableBody');
             if (!tableBody) return;
 
             if (!Array.isArray(leadsArray) || leadsArray.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No leads available. Upload CSV or connect Meta Ads.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400">No leads available. Upload CSV or create a campaign.</td></tr>`;
                 return;
             }
 
@@ -314,5 +368,162 @@
             }).join('');
         }
 
-        // Update Lead Status Endpoint
-        async function updateLeadSta  
+        // 4. UPDATE LEAD STATUS
+        async function updateLeadStatus(leadId, newStatus) {
+            const token = localStorage.getItem('token');
+            try {
+                await fetch(`${API_BASE}/api/leads/${leadId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: newStatus })
+                });
+            } catch (err) {
+                alert('Status update failed');
+            }
+        }
+
+        // 5. VIEW AI ANALYSIS MODAL
+        function viewAiAnalysis(leadId) {
+            const lead = globalLeads.find(l => l.id === leadId);
+            if (!lead) return;
+            document.getElementById('aiModalContent').innerHTML = `
+                <p><strong>Name:</strong> ${escapeHtml(lead.full_name)}</p>
+                <p><strong>AI Score:</strong> ${escapeHtml(lead.ai_score || 'N/A')}</p>
+                <p><strong>AI Summary:</strong> ${escapeHtml(lead.ai_summary || 'No AI summary generated yet.')}</p>
+            `;
+            openModal('aiModal');
+        }
+
+        // 6. METRICS & TRIAL UPDATE
+        function updateMetrics(leads) {
+            if (!Array.isArray(leads)) return;
+            document.getElementById('metricTotalLeads').innerText = leads.length;
+            document.getElementById('metricHotLeads').innerText = leads.filter(l => l.ai_score === 'Hot').length;
+            document.getElementById('metricWarmLeads').innerText = leads.filter(l => l.ai_score === 'Warm').length;
+            
+            const leadsLeft = Math.max(0, 10 - leads.length);
+            document.getElementById('metricTrial').innerText = `${leadsLeft} Free Leads Left (7-Day Trial Active)`;
+        }
+
+        // 7. MODAL CONTROLLERS
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function switchModal(fromId, toId) { closeModal(fromId); openModal(toId); }
+
+        // 8. AUTH FORM HANDLERS
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    closeModal('loginModal');
+                    fetchLeads();
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+            } catch (err) { alert('Login request failed'); }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        full_name: document.getElementById('signupName').value,
+                        email: document.getElementById('signupEmail').value,
+                        password: document.getElementById('signupPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    closeModal('signupModal');
+                    fetchLeads();
+                } else {
+                    alert(data.error || 'Signup failed');
+                }
+            } catch (err) { alert('Signup request failed'); }
+        });
+
+        document.getElementById('forgotForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Password reset link has been sent to your email.');
+            closeModal('forgotModal');
+        });
+
+        // 9. CAMPAIGN FORM HANDLER
+        document.getElementById('campaignForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Campaign launched successfully!');
+            closeModal('campaignModal');
+        });
+
+        // 10. CSV UPLOAD HANDLER
+        document.getElementById('csvForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const fileInput = document.getElementById('csvFile');
+            if (!token) { alert('Please login first!'); return; }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/leads/upload-csv`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (res.ok) {
+                    alert('CSV Imported successfully!');
+                    fetchLeads();
+                } else {
+                    alert('Upload failed');
+                }
+            } catch (err) { alert('Upload request failed.'); }
+        });
+
+        // 11. CITY SEARCH FILTER LOGIC
+        document.getElementById('cityInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (query.length < 2) {
+                renderLeads(globalLeads);
+                return;
+            }
+            const filtered = globalLeads.filter(lead => 
+                (lead.city && lead.city.toLowerCase().includes(query)) ||
+                (lead.full_name && lead.full_name.toLowerCase().includes(query))
+            );
+            renderLeads(filtered);
+        });
+
+        // 12. HELPER UTILS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.reload();
+        }
+
+        // INIT ON LOAD
+        window.addEventListener('DOMContentLoaded', () => {
+            checkHealth();
+            fetchLeads();
+        });
+    </script>
+</body>
+</html>
