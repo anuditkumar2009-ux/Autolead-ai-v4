@@ -1,29 +1,48 @@
+-- Existing DB Cleanup & Table Creation
 CREATE TABLE IF NOT EXISTS users (
- id BIGSERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL,
- email VARCHAR(254) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL,
- created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS agent_trials (
- agent_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
- trial_start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
- leads_processed_count INTEGER NOT NULL DEFAULT 0 CHECK (leads_processed_count >= 0),
- is_active BOOLEAN NOT NULL DEFAULT TRUE
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    leads_processed INT DEFAULT 0,
+    trial_start TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
 );
+
 CREATE TABLE IF NOT EXISTS leads (
- id BIGSERIAL PRIMARY KEY, agent_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
- name VARCHAR(150) NOT NULL, phone VARCHAR(30), email VARCHAR(254),
- location VARCHAR(150), property_requirement VARCHAR(200), budget VARCHAR(100),
- buyer_segment VARCHAR(100), source VARCHAR(150) NOT NULL,
- verification_status VARCHAR(30) NOT NULL DEFAULT 'Needs Verification',
- last_verified_date DATE, lead_score INTEGER CHECK (lead_score IS NULL OR lead_score BETWEEN 0 AND 100),
- lead_temperature VARCHAR(10), lead_status VARCHAR(30) NOT NULL DEFAULT 'New',
- notes TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    fb_lead_id VARCHAR(100) UNIQUE, -- Meta Webhook Duplicate Check ke liye
+    source VARCHAR(50) DEFAULT 'Meta Ads', -- Lead kahan se aayi
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255),
+    budget VARCHAR(50),
+    preferred_location VARCHAR(100),
+    property_type VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'New', -- New, Qualified, Contacted, Site Visit, etc.
+    ai_score VARCHAR(20),
+    ai_summary TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_leads_agent_created ON leads(agent_id,created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_leads_agent_status ON leads(agent_id,lead_status);
+
 CREATE TABLE IF NOT EXISTS lead_activities (
- id BIGSERIAL PRIMARY KEY, lead_id BIGINT NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
- agent_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
- activity_type VARCHAR(50) NOT NULL, details TEXT,
- created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id SERIAL PRIMARY KEY,
+    lead_id INT REFERENCES leads(id) ON DELETE CASCADE,
+    activity_type VARCHAR(50) NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
