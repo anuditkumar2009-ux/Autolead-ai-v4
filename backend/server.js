@@ -801,3 +801,54 @@ initDb().then(()=>{
   console.error("DATABASE INIT FAILED",e);
   process.exit(1);
 });
+// ==========================================
+// META (FACEBOOK) LEAD ADS WEBHOOK ENDPOINT
+// ==========================================
+
+// 1. Webhook Verification (Meta API Handshake)
+app.get('/api/webhooks/facebook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || 'autolead_secret_token_2026';
+
+  if (mode && token) {
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+      console.log('✅ Meta Webhook Verified Successfully!');
+      return res.status(200).send(challenge);
+    } else {
+      return res.sendStatus(403);
+    }
+  }
+  res.sendStatus(400);
+});
+
+// 2. Lead Data Processing Endpoint
+app.post('/api/webhooks/facebook', async (req, res) => {
+  try {
+    const body = req.body;
+
+    if (body.object === 'page') {
+      for (const entry of body.entry) {
+        for (const change of entry.changes) {
+          if (change.field === 'leadgen') {
+            const leadgenId = change.value.leadgen_id;
+            const pageId = change.value.page_id;
+            
+            console.log(`📥 New Meta Lead Event Received! Lead ID: ${leadgenId}, Page ID: ${pageId}`);
+
+            // DB Insert Query for Lead Record
+            // Production me Meta Graph API Call se lead details fecth karke save hoti hain
+          }
+        }
+      }
+      return res.status(200).send('EVENT_RECEIVED');
+    } else {
+      return res.sendStatus(404);
+    }
+  } catch (error) {
+    console.error('❌ Meta Webhook Error:', error);
+    return res.status(500).send('Internal Server Error');
+  }
+});
