@@ -6,1242 +6,926 @@
 <meta name="theme-color" content="#090612">
 <meta name="color-scheme" content="dark">
 <title>AutoLead AI — Real Estate Sales Intelligence</title>
-
 <style>
 :root{
-  --bg:#08050f;
-  --bg2:#0d0917;
-  --panel:#100b1b;
-  --panel2:#161024;
-  --panel3:#1d1430;
-  --line:rgba(255,255,255,.09);
-  --line2:rgba(155,108,255,.28);
-  --text:#f8f7ff;
-  --muted:#aaa2bd;
-  --muted2:#746b85;
-  --purple:#9b6cff;
-  --purple2:#6d35e8;
-  --purple3:#c0a2ff;
-  --blue:#61a8ff;
-  --green:#35d39a;
-  --yellow:#ffc857;
-  --red:#ff6b81;
-  --shadow:0 24px 70px rgba(0,0,0,.38);
+--bg:#08050f;
+--bg2:#0d0917;
+--panel:#100b1b;
+--panel2:#161024;
+--panel3:#1d1430;
+--line:rgba(255,255,255,.09);
+--line2:rgba(155,108,255,.28);
+--text:#f8f7ff;
+--muted:#aaa2bd;
+--muted2:#746b85;
+--purple:#9b6cff;
+--purple2:#6d35e8;
+--purple3:#c0a2ff;
+--blue:#61a8ff;
+--green:#35d39a;
+--yellow:#ffc857;
+--red:#ff6b81;
+--shadow:0 24px 70px rgba(0,0,0,.38);
 }
-
 *{box-sizing:border-box}
-
 html,body{
-  margin:0;
-  min-height:100%;
-  background:
-    radial-gradient(circle at 15% 0%,rgba(125,64,240,.18),transparent 34%),
-    radial-gradient(circle at 100% 12%,rgba(96,47,180,.12),transparent 30%),
-    var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+margin:0;
+min-height:100%;
+background:
+  radial-gradient(circle at 15% 0%,rgba(125,64,240,.18),transparent 34%),
+  radial-gradient(circle at 100% 12%,rgba(96,47,180,.12),transparent 30%),
+  var(--bg);
+color:var(--text);
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
-
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:disabled{cursor:not-allowed;opacity:.55}
-
 .hidden{display:none!important}
 
-/* =========================
-   BUTTONS
-========================= */
-
+/* BUTTONS */
 .btn{
-  position:relative;
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:9px 12px;
-  color:#f7f2ff;
-  background:rgba(255,255,255,.045);
-  font-size:10px;
-  font-weight:800;
-  transition:
-    transform .16s ease,
-    filter .16s ease,
-    box-shadow .16s ease,
-    border-color .16s ease;
+position:relative;overflow:hidden;
+border:1px solid var(--line);border-radius:11px;padding:9px 12px;
+color:#f7f2ff;background:rgba(255,255,255,.045);
+font-size:10px;font-weight:800;
+transition:transform .16s ease,filter .16s ease,box-shadow .16s ease,border-color .16s ease;
 }
-
-.btn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.08);
-  border-color:rgba(155,108,255,.45);
-}
-
-.btn:active{
-  transform:translateY(1px) scale(.97);
-}
-
-.btn-primary{
-  border:0;
-  background:linear-gradient(135deg,#a16aff,#7135eb);
-  box-shadow:0 12px 30px rgba(112,53,235,.26);
-}
-
-.btn-green{
-  color:#9ef2ca;
-  background:rgba(53,211,154,.08);
-}
-
-.btn-blue{
-  color:#a9ceff;
-  background:rgba(97,168,255,.08);
-}
-
-.btn-purple{
-  color:#d7c0ff;
-  background:rgba(155,108,255,.09);
-}
-
-.btn-yellow{
-  color:#ffdda0;
-  background:rgba(255,200,87,.08);
-}
-
-.btn-red{
-  color:#ffbdc8;
-  background:rgba(255,107,129,.08);
-}
-
-.btn-dark{
-  background:rgba(255,255,255,.035);
-}
-
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08);border-color:rgba(155,108,255,.45);}
+.btn:active{transform:translateY(1px) scale(.97);}
+.btn-primary{border:0;background:linear-gradient(135deg,#a16aff,#7135eb);box-shadow:0 12px 30px rgba(112,53,235,.26);}
+.btn-green{color:#9ef2ca;background:rgba(53,211,154,.08);}
+.btn-blue{color:#a9ceff;background:rgba(97,168,255,.08);}
+.btn-purple{color:#d7c0ff;background:rgba(155,108,255,.09);}
+.btn-yellow{color:#ffdda0;background:rgba(255,200,87,.08);}
+.btn-red{color:#ffbdc8;background:rgba(255,107,129,.08);}
+.btn-dark{background:rgba(255,255,255,.035);}
 .btn-full{width:100%}
-
 .ripple{
-  position:absolute;
-  border-radius:50%;
-  background:rgba(255,255,255,.32);
-  transform:scale(0);
-  pointer-events:none;
-  animation:ripple .58s linear;
+position:absolute;border-radius:50%;background:rgba(255,255,255,.32);
+transform:scale(0);pointer-events:none;animation:ripple .58s linear;
 }
-
-@keyframes ripple{
-  to{
-    transform:scale(4);
-    opacity:0;
-  }
-}
-
+@keyframes ripple{to{transform:scale(4);opacity:0;}}
 .spinner{
-  width:15px;
-  height:15px;
-  display:inline-block;
-  vertical-align:-3px;
-  margin-right:7px;
-  border:2px solid rgba(255,255,255,.28);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
+width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:7px;
+border:2px solid rgba(255,255,255,.28);border-top-color:#fff;
+border-radius:50%;animation:spin .7s linear infinite;
 }
+@keyframes spin{to{transform:rotate(360deg)}}
 
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
-/* =========================
-   TOAST
-========================= */
-
+/* TOAST */
 #toast{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  z-index:99999;
-  width:min(390px,calc(100% - 24px));
-  padding:12px 15px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#181126;
-  box-shadow:var(--shadow);
-  color:#eee8fa;
-  text-align:center;
-  font-size:10px;
-  opacity:0;
-  pointer-events:none;
-  transform:translate(-50%,18px);
-  transition:.25s ease;
+position:fixed;left:50%;bottom:18px;z-index:99999;
+width:min(390px,calc(100% - 24px));padding:12px 15px;
+border:1px solid var(--line);border-radius:14px;
+background:#181126;box-shadow:var(--shadow);
+color:#eee8fa;text-align:center;font-size:10px;
+opacity:0;pointer-events:none;
+transform:translate(-50%,18px);transition:.25s ease;
 }
+#toast.show{opacity:1;transform:translate(-50%,0);}
+#toast.error{border-color:rgba(255,107,129,.4);}
 
-#toast.show{
-  opacity:1;
-  transform:translate(-50%,0);
-}
-
-#toast.error{
-  border-color:rgba(255,107,129,.4);
-}
-
-/* =========================
-   AUTH
-========================= */
-
+/* AUTH */
 .auth-screen{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:18px;
-  position:relative;
-  overflow:hidden;
+min-height:100vh;display:grid;place-items:center;
+padding:18px;position:relative;overflow:hidden;
 }
-
 .auth-glow{
-  position:absolute;
-  width:580px;
-  height:580px;
-  top:-250px;
-  left:50%;
-  transform:translateX(-50%);
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(135,76,255,.23),transparent 67%);
-  pointer-events:none;
+position:absolute;width:580px;height:580px;top:-250px;left:50%;
+transform:translateX(-50%);border-radius:50%;
+background:radial-gradient(circle,rgba(135,76,255,.23),transparent 67%);
+pointer-events:none;
 }
-
 .auth-card{
-  width:min(100%,470px);
-  position:relative;
-  padding:30px;
-  border:1px solid var(--line);
-  border-radius:28px;
-  background:rgba(16,11,27,.93);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(20px);
+width:min(100%,470px);position:relative;padding:30px;
+border:1px solid var(--line);border-radius:28px;
+background:rgba(16,11,27,.93);box-shadow:var(--shadow);backdrop-filter:blur(20px);
 }
-
-.auth-brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:30px;
-  font-size:17px;
-  font-weight:900;
-}
-
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:30px;font-size:17px;font-weight:900;}
 .logo{
-  width:39px;
-  height:39px;
-  display:grid;
-  place-items:center;
-  border-radius:12px;
-  background:linear-gradient(135deg,#b184ff,#6d35e8);
-  box-shadow:0 10px 30px rgba(109,53,232,.32);
+width:39px;height:39px;display:grid;place-items:center;
+border-radius:12px;background:linear-gradient(135deg,#b184ff,#6d35e8);
+box-shadow:0 10px 30px rgba(109,53,232,.32);
 }
-
-.auth-title{
-  margin:0 0 8px;
-  font-size:35px;
-  line-height:1;
-  letter-spacing:-1.5px;
-}
-
-.auth-sub{
-  margin:0 0 27px;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.field{
-  margin-bottom:14px;
-}
-
-.field label{
-  display:block;
-  margin-bottom:7px;
-  color:#d9d2e5;
-  font-size:10px;
-  font-weight:850;
-}
-
+.auth-title{margin:0 0 8px;font-size:35px;line-height:1;letter-spacing:-1.5px;}
+.auth-sub{margin:0 0 27px;color:var(--muted);font-size:13px;}
+.field{margin-bottom:14px;}
+.field label{display:block;margin-bottom:7px;color:#d9d2e5;font-size:10px;font-weight:850;}
 .field input{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:13px 14px;
-  outline:none;
-  color:#20172c;
-  background:#f1f1fb;
-  transition:.2s;
+width:100%;border:1px solid var(--line);border-radius:13px;
+padding:13px 14px;outline:none;color:#20172c;background:#f1f1fb;transition:.2s;
 }
+.field input:focus{border-color:rgba(155,108,255,.75);box-shadow:0 0 0 4px rgba(155,108,255,.1);}
+.auth-row{display:flex;justify-content:flex-end;margin:-2px 0 13px;}
+.link{border:0;padding:2px 0;color:#c09fff;background:none;font-size:9px;font-weight:800;}
+.auth-message{min-height:17px;margin-top:10px;color:#ffb5c2;font-size:9px;}
+.auth-switch{width:100%;margin-top:13px;}
+.auth-note{margin-top:18px;color:#746b85;font-size:8px;line-height:1.55;text-align:center;}
 
-.field input:focus{
-  border-color:rgba(155,108,255,.75);
-  box-shadow:0 0 0 4px rgba(155,108,255,.1);
-}
-
-.auth-row{
-  display:flex;
-  justify-content:flex-end;
-  margin:-2px 0 13px;
-}
-
-.link{
-  border:0;
-  padding:2px 0;
-  color:#c09fff;
-  background:none;
-  font-size:9px;
-  font-weight:800;
-}
-
-.auth-message{
-  min-height:17px;
-  margin-top:10px;
-  color:#ffb5c2;
-  font-size:9px;
-}
-
-.auth-switch{
-  width:100%;
-  margin-top:13px;
-}
-
-.auth-note{
-  margin-top:18px;
-  color:#746b85;
-  font-size:8px;
-  line-height:1.55;
-  text-align:center;
-}
-
-/* =========================
-   TOPBAR
-========================= */
-
-.app-screen{
-  min-height:100vh;
-}
-
+/* TOPBAR */
+.app-screen{min-height:100vh;}
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  min-height:66px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 18px;
-  border-bottom:1px solid var(--line);
-  background:rgba(8,5,15,.86);
-  backdrop-filter:blur(18px);
+position:sticky;top:0;z-index:1000;min-height:66px;
+display:flex;align-items:center;justify-content:space-between;gap:10px;
+padding:10px 18px;border-bottom:1px solid var(--line);
+background:rgba(8,5,15,.86);backdrop-filter:blur(18px);
 }
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  font-size:15px;
-  font-weight:900;
-}
-
-.brand .logo{
-  width:33px;
-  height:33px;
-  border-radius:10px;
-}
-
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:7px;
-}
-
+.brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:900;}
+.brand .logo{width:33px;height:33px;border-radius:10px;}
+.top-actions{display:flex;align-items:center;gap:7px;}
 .health{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:7px 10px;
-  border:1px solid rgba(53,211,154,.22);
-  border-radius:999px;
-  color:#98f1c8;
-  background:rgba(53,211,154,.07);
-  font-size:8px;
-  font-weight:850;
+display:flex;align-items:center;gap:6px;padding:7px 10px;
+border:1px solid rgba(53,211,154,.22);border-radius:999px;
+color:#98f1c8;background:rgba(53,211,154,.07);font-size:8px;font-weight:850;
 }
-
-.health.offline{
-  color:#ffbdc9;
-  border-color:rgba(255,107,129,.22);
-  background:rgba(255,107,129,.06);
-}
-
-.dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 11px var(--green);
-}
-
-.offline .dot{
-  background:var(--red);
-  box-shadow:0 0 11px rgba(255,107,129,.6);
-}
-
+.health.offline{color:#ffbdc9;border-color:rgba(255,107,129,.22);background:rgba(255,107,129,.06);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 11px var(--green);}
+.offline .dot{background:var(--red);box-shadow:0 0 11px rgba(255,107,129,.6);}
 .user-chip{
-  max-width:190px;
-  padding:7px 9px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  color:var(--muted);
-  font-size:8px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+max-width:190px;padding:7px 9px;border:1px solid var(--line);
+border-radius:9px;color:var(--muted);font-size:8px;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-
 .logout{
-  border:1px solid var(--line);
-  border-radius:9px;
-  padding:8px 10px;
-  color:#ddd6e8;
-  background:rgba(255,255,255,.04);
-  font-size:9px;
-  font-weight:800;
+border:1px solid var(--line);border-radius:9px;padding:8px 10px;
+color:#ddd6e8;background:rgba(255,255,255,.04);font-size:9px;font-weight:800;
 }
 
-/* =========================
-   LAYOUT
-========================= */
-
-.container{
-  width:min(1240px,calc(100% - 28px));
-  margin:auto;
-  padding:26px 0 55px;
-}
-
-.hero{
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:18px;
-  margin-bottom:20px;
-}
-
-.eyebrow{
-  margin-bottom:8px;
-  color:#b99cff;
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.15em;
-}
-
-.hero h1{
-  margin:0;
-  max-width:780px;
-  font-size:clamp(29px,5vw,50px);
-  line-height:.98;
-  letter-spacing:-2.5px;
-}
-
-.hero h1 span{
-  color:transparent;
-  background:linear-gradient(90deg,#fff,#b895ff);
-  -webkit-background-clip:text;
-  background-clip:text;
-}
-
-.hero p{
-  max-width:680px;
-  margin:12px 0 0;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.55;
-}
-
+/* LAYOUT */
+.container{width:min(1240px,calc(100% - 28px));margin:auto;padding:26px 0 55px;}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:20px;}
+.eyebrow{margin-bottom:8px;color:#b99cff;font-size:9px;font-weight:900;letter-spacing:.15em;}
+.hero h1{margin:0;max-width:780px;font-size:clamp(29px,5vw,50px);line-height:.98;letter-spacing:-2.5px;}
+.hero h1 span{color:transparent;background:linear-gradient(90deg,#fff,#b895ff);-webkit-background-clip:text;background-clip:text;}
+.hero p{max-width:680px;margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.55;}
 .trial-pill{
-  flex-shrink:0;
-  padding:10px 12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:rgba(255,255,255,.035);
-  color:#d9d1e8;
-  font-size:9px;
-  white-space:nowrap;
+flex-shrink:0;padding:10px 12px;border:1px solid var(--line);
+border-radius:12px;background:rgba(255,255,255,.035);color:#d9d1e8;font-size:9px;white-space:nowrap;
 }
 
-/* =========================
-   OFFER
-========================= */
-
+/* OFFER */
 .offer{
-  margin-bottom:14px;
-  padding:15px;
-  border:1px solid rgba(155,108,255,.28);
-  border-radius:16px;
-  background:
-    linear-gradient(135deg,rgba(109,53,232,.17),rgba(97,168,255,.04)),
-    var(--panel);
+margin-bottom:14px;padding:15px;border:1px solid rgba(155,108,255,.28);border-radius:16px;
+background:linear-gradient(135deg,rgba(109,53,232,.17),rgba(97,168,255,.04)),var(--panel);
 }
+.offer-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.offer-title{font-size:11px;font-weight:900;}
+.offer-sub{margin-top:3px;color:#a997c5;font-size:8px;}
+.offer-price{font-size:19px;font-weight:900;white-space:nowrap;}
+.offer-status{margin-top:7px;color:#8d849f;font-size:8px;}
 
-.offer-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-}
-
-.offer-title{
-  font-size:11px;
-  font-weight:900;
-}
-
-.offer-sub{
-  margin-top:3px;
-  color:#a997c5;
-  font-size:8px;
-}
-
-.offer-price{
-  font-size:19px;
-  font-weight:900;
-  white-space:nowrap;
-}
-
-.offer-status{
-  margin-top:7px;
-  color:#8d849f;
-  font-size:8px;
-}
-
-/* =========================
-   ADS
-========================= */
-
+/* AD */
 .ad-slot{
-  min-height:66px;
-  margin:12px 0;
-  display:grid;
-  place-items:center;
-  border:1px dashed #39314f;
-  border-radius:13px;
-  background:rgba(255,255,255,.016);
-  color:#645d72;
-  text-align:center;
-  font-size:8px;
+min-height:66px;margin:12px 0;display:grid;place-items:center;
+border:1px dashed #39314f;border-radius:13px;
+background:rgba(255,255,255,.016);color:#645d72;text-align:center;font-size:8px;
 }
+.ad-slot strong{display:block;margin-bottom:3px;color:#847a93;}
 
-.ad-slot strong{
-  display:block;
-  margin-bottom:3px;
-  color:#847a93;
-}
-
-/* =========================
-   STATS
-========================= */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:9px;
-  margin-bottom:14px;
-}
-
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px;}
 .stat{
-  position:relative;
-  overflow:hidden;
-  padding:16px;
-  border:1px solid var(--line);
-  border-radius:17px;
-  background:linear-gradient(145deg,rgba(28,20,48,.88),rgba(16,11,27,.93));
+position:relative;overflow:hidden;padding:16px;
+border:1px solid var(--line);border-radius:17px;
+background:linear-gradient(145deg,rgba(28,20,48,.88),rgba(16,11,27,.93));
 }
-
 .stat:after{
-  content:"";
-  position:absolute;
-  right:-45px;
-  top:-45px;
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  background:rgba(155,108,255,.08);
+content:"";position:absolute;right:-45px;top:-45px;width:100px;height:100px;
+border-radius:50%;background:rgba(155,108,255,.08);
 }
+.stat-label{color:var(--muted);font-size:8px;font-weight:800;text-transform:uppercase;}
+.stat-num{margin-top:5px;font-size:24px;font-weight:900;}
+.stat-note{margin-top:3px;color:var(--muted2);font-size:7px;}
 
-.stat-label{
-  color:var(--muted);
-  font-size:8px;
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-.stat-num{
-  margin-top:5px;
-  font-size:24px;
-  font-weight:900;
-}
-
-.stat-note{
-  margin-top:3px;
-  color:var(--muted2);
-  font-size:7px;
-}
-
-/* =========================
-   GRID/CARDS
-========================= */
-
-.grid{
-  display:grid;
-  grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);
-  gap:13px;
-}
-
-.stack{
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-}
-
+/* GRID/CARDS */
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:13px;}
+.stack{display:flex;flex-direction:column;gap:13px;}
 .card{
-  padding:17px;
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:rgba(16,11,27,.92);
-  box-shadow:0 12px 40px rgba(0,0,0,.1);
+padding:17px;border:1px solid var(--line);border-radius:18px;
+background:rgba(16,11,27,.92);box-shadow:0 12px 40px rgba(0,0,0,.1);
 }
-
-.card-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
-  margin-bottom:14px;
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;}
+.card-title{font-size:13px;font-weight:900;}
+.card-sub{margin-top:3px;color:var(--muted);font-size:9px;line-height:1.45;}
+.label{display:block;margin:9px 0 5px;color:#d4ccdf;font-size:8px;font-weight:850;text-transform:uppercase;}
+.input,.select,.search{
+width:100%;border:1px solid var(--line);outline:none;border-radius:10px;
+padding:10px 11px;color:#eee9f8;background:#120c1f;font-size:9px;transition:.2s;
 }
-
-.card-title{
-  font-size:13px;
-  font-weight:900;
-}
-
-.card-sub{
-  margin-top:3px;
-  color:var(--muted);
-  font-size:9px;
-  line-height:1.45;
-}
-
-.label{
-  display:block;
-  margin:9px 0 5px;
-  color:#d4ccdf;
-  font-size:8px;
-  font-weight:850;
-  text-transform:uppercase;
-}
-
-.input,
-.select,
-.search{
-  width:100%;
-  border:1px solid var(--line);
-  outline:none;
-  border-radius:10px;
-  padding:10px 11px;
-  color:#eee9f8;
-  background:#120c1f;
-  font-size:9px;
-  transition:.2s;
-}
-
-.input:focus,
-.select:focus,
-.search:focus{
-  border-color:rgba(155,108,255,.65);
-  box-shadow:0 0 0 3px rgba(155,108,255,.08);
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
+.input:focus,.select:focus,.search:focus{border-color:rgba(155,108,255,.65);box-shadow:0 0 0 3px rgba(155,108,255,.08);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .notice{
-  margin-top:7px;
-  padding:9px 10px;
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:10px;
-  background:rgba(255,255,255,.025);
-  color:#898196;
-  font-size:7px;
-  line-height:1.55;
+margin-top:7px;padding:9px 10px;border:1px solid rgba(255,255,255,.06);
+border-radius:10px;background:rgba(255,255,255,.025);color:#898196;font-size:7px;line-height:1.55;
 }
 
-/* =========================
-   SOURCES
-========================= */
-
+/* SOURCES */
 .source{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:9px;
-  padding:11px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#0e0918;
+display:flex;align-items:center;justify-content:space-between;
+gap:9px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#0e0918;
 }
+.source+.source{margin-top:7px;}
+.source-title{font-size:9px;font-weight:900;}
+.source-desc{margin-top:2px;color:var(--muted2);font-size:7px;}
+.badge{padding:4px 7px;border-radius:999px;font-size:6px;font-weight:900;white-space:nowrap;}
+.badge-green{color:#93f1c6;background:rgba(53,211,154,.08);}
+.badge-yellow{color:#ffdda0;background:rgba(255,200,87,.08);}
 
-.source + .source{
-  margin-top:7px;
-}
+/* PIPELINE */
+.pipeline{display:flex;gap:6px;overflow:auto;padding-bottom:3px;margin-top:11px;margin-bottom:12px;}
+.pipe{min-width:86px;padding:9px;border:1px solid var(--line);border-radius:10px;background:#0d0917;text-align:center;}
+.pipe strong{display:block;font-size:15px;}
+.pipe span{color:#70677f;font-size:6px;font-weight:850;}
 
-.source-title{
-  font-size:9px;
-  font-weight:900;
-}
-
-.source-desc{
-  margin-top:2px;
-  color:var(--muted2);
-  font-size:7px;
-}
-
-.badge{
-  padding:4px 7px;
-  border-radius:999px;
-  font-size:6px;
-  font-weight:900;
-  white-space:nowrap;
-}
-
-.badge-green{
-  color:#93f1c6;
-  background:rgba(53,211,154,.08);
-}
-
-.badge-yellow{
-  color:#ffdda0;
-  background:rgba(255,200,87,.08);
-}
-
-/* =========================
-   PIPELINE
-========================= */
-
-.pipeline{
-  display:flex;
-  gap:6px;
-  overflow:auto;
-  padding-bottom:3px;
-  margin-top:11px;
-  margin-bottom:12px;
-}
-
-.pipe{
-  min-width:86px;
-  padding:9px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#0d0917;
-  text-align:center;
-}
-
-.pipe strong{
-  display:block;
-  font-size:15px;
-}
-
-.pipe span{
-  color:#70677f;
-  font-size:6px;
-  font-weight:850;
-}
-
-/* =========================
-   LEADS
-========================= */
-
-.leads{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
+/* LEADS */
+.leads{display:flex;flex-direction:column;gap:8px;}
 .lead{
-  padding:13px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:linear-gradient(145deg,rgba(29,20,48,.66),rgba(15,10,25,.69));
-  transition:.2s;
+padding:13px;border:1px solid var(--line);border-radius:14px;
+background:linear-gradient(145deg,rgba(29,20,48,.66),rgba(15,10,25,.69));transition:.2s;
 }
-
-.lead:hover{
-  border-color:rgba(155,108,255,.24);
-}
-
-.lead-top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.lead-name{
-  font-size:11px;
-  font-weight:900;
-}
-
-.lead-line{
-  margin-top:4px;
-  color:var(--muted);
-  font-size:8px;
-  line-height:1.45;
-}
-
+.lead:hover{border-color:rgba(155,108,255,.24);}
+.lead-top{display:flex;justify-content:space-between;gap:10px;}
+.lead-name{font-size:11px;font-weight:900;}
+.lead-line{margin-top:4px;color:var(--muted);font-size:8px;line-height:1.45;}
 .score{
-  flex-shrink:0;
-  min-width:45px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  border:1px solid rgba(155,108,255,.2);
-  border-radius:10px;
-  background:rgba(155,108,255,.07);
-  color:#c4a7ff;
-  font-size:13px;
-  font-weight:900;
+flex-shrink:0;min-width:45px;height:40px;display:grid;place-items:center;
+border:1px solid rgba(155,108,255,.2);border-radius:10px;
+background:rgba(155,108,255,.07);color:#c4a7ff;font-size:13px;font-weight:900;
 }
-
-.temperature{
-  display:inline-flex;
-  margin-top:6px;
-  padding:3px 6px;
-  border-radius:999px;
-  font-size:6px;
-  font-weight:900;
-}
-
-.temperature.Hot{
-  color:#ffbdc9;
-  background:rgba(255,107,129,.08);
-}
-
-.temperature.Warm{
-  color:#ffe09d;
-  background:rgba(255,200,87,.08);
-}
-
-.temperature.Cold{
-  color:#afd2ff;
-  background:rgba(97,168,255,.08);
-}
-
-.lead-meta-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  margin-top:7px;
-}
-
+.temperature{display:inline-flex;margin-top:6px;padding:3px 6px;border-radius:999px;font-size:6px;font-weight:900;}
+.temperature.Hot{color:#ffbdc9;background:rgba(255,107,129,.08);}
+.temperature.Warm{color:#ffe09d;background:rgba(255,200,87,.08);}
+.temperature.Cold{color:#afd2ff;background:rgba(97,168,255,.08);}
+.lead-meta-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
 .mini{
-  padding:5px 6px;
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:7px;
-  background:rgba(255,255,255,.025);
-  color:#c7c0d6;
-  font-size:7px;
+padding:5px 6px;border:1px solid rgba(255,255,255,.06);
+border-radius:7px;background:rgba(255,255,255,.025);color:#c7c0d6;font-size:7px;
 }
+.lead-actions{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:9px;}
+.lead-actions .btn{padding:7px 8px;font-size:7px;}
+.status-select{min-width:122px;max-width:135px;margin-left:auto;}
+.empty{padding:31px 12px;color:#696175;text-align:center;font-size:9px;}
+.empty-icon{display:block;margin-bottom:6px;font-size:25px;opacity:.65;}
 
-.lead-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:5px;
-  align-items:center;
-  margin-top:9px;
-}
+/* SEARCH */
+.search-row{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:7px;}
 
-.lead-actions .btn{
-  padding:7px 8px;
-  font-size:7px;
-}
-
-.status-select{
-  min-width:122px;
-  max-width:135px;
-  margin-left:auto;
-}
-
-.empty{
-  padding:31px 12px;
-  color:#696175;
-  text-align:center;
-  font-size:9px;
-}
-
-.empty-icon{
-  display:block;
-  margin-bottom:6px;
-  font-size:25px;
-  opacity:.65;
-}
-
-/* =========================
-   SEARCH
-========================= */
-
-.search-row{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 140px;
-  gap:7px;
-}
-
-/* =========================
-   MODALS
-========================= */
-
+/* MODAL */
 .modal{
-  position:fixed;
-  inset:0;
-  z-index:5000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:13px;
-  background:rgba(0,0,0,.78);
-  backdrop-filter:blur(10px);
+position:fixed;inset:0;z-index:5000;display:none;
+align-items:center;justify-content:center;padding:13px;
+background:rgba(0,0,0,.78);backdrop-filter:blur(10px);
 }
-
-.modal.active{
-  display:flex;
-}
-
+.modal.active{display:flex;}
 .modal-card{
-  width:min(100%,520px);
-  max-height:90vh;
-  overflow:auto;
-  padding:17px;
-  border:1px solid #362d51;
-  border-radius:17px;
-  background:#110d1d;
-  box-shadow:0 30px 90px rgba(0,0,0,.55);
+width:min(100%,520px);max-height:90vh;overflow:auto;
+padding:17px;border:1px solid #362d51;border-radius:17px;
+background:#110d1d;box-shadow:0 30px 90px rgba(0,0,0,.55);
 }
-
-.modal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-.modal-title{
-  font-size:13px;
-  font-weight:900;
-}
-
-.x{
-  width:30px;
-  height:30px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  color:#fff;
-  background:rgba(255,255,255,.035);
-}
-
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;}
+.modal-title{font-size:13px;font-weight:900;}
+.x{width:30px;height:30px;border:1px solid var(--line);border-radius:9px;color:#fff;background:rgba(255,255,255,.035);}
 .ai-box{
-  min-height:185px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:11px;
-  color:#d6cfdf;
-  background:#0b0812;
-  white-space:pre-wrap;
-  font-size:9px;
-  line-height:1.65;
+min-height:185px;padding:12px;border:1px solid var(--line);border-radius:11px;
+color:#d6cfdf;background:#0b0812;white-space:pre-wrap;font-size:9px;line-height:1.65;
 }
 
-.modal-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-top:7px;
-}
+/* FOOTER */
+.footer{margin-top:18px;color:#544c62;text-align:center;font-size:7px;line-height:1.5;}
 
-.footer{
-  margin-top:18px;
-  color:#544c62;
-  text-align:center;
-  font-size:7px;
-  line-height:1.5;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:900px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-}
-
+/* MOBILE */
+@media(max-width:900px){.grid{grid-template-columns:1fr;}}
 @media(max-width:700px){
-
-  .hero{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .user-chip{
-    display:none;
-  }
-
-  .health{
-    display:none;
-  }
+.hero{flex-direction:column;align-items:flex-start;}
+.stats{grid-template-columns:1fr 1fr;}
+.user-chip{display:none;}
 }
-
 @media(max-width:500px){
-
-  .container{
-    width:calc(100% - 18px);
-    padding-top:17px;
-  }
-
-  .topbar{
-    padding:9px 11px;
-  }
-
-  .hero h1{
-    font-size:31px;
-  }
-
-  .auth-card{
-    padding:22px;
-    border-radius:22px;
-  }
-
-  .auth-title{
-    font-size:29px;
-  }
-
-  .form-grid,
-  .search-row{
-    grid-template-columns:1fr;
-  }
-
-  .card{
-    padding:14px;
-  }
-
-  .stat{
-    padding:13px;
-  }
-
-  .stat-num{
-    font-size:21px;
-  }
-
-  .status-select{
-    width:100%;
-    max-width:none;
-    margin-left:0;
-  }
-
-  .trial-pill{
-    align-self:stretch;
-    text-align:center;
-  }
+.container{width:calc(100% - 18px);padding-top:17px;}
+.topbar{padding:9px 11px;}
+.hero h1{font-size:31px;}
+.auth-card{padding:22px;border-radius:22px;}
+.auth-title{font-size:29px;}
+.form-grid,.search-row{grid-template-columns:1fr;}
+.card{padding:14px;}
+.stat{padding:13px;}
+.stat-num{font-size:21px;}
+.status-select{width:100%;max-width:none;margin-left:0;}
+.trial-pill{align-self:stretch;text-align:center;}
 }
 </style>
 </head>
-
 <body>
 
-<!-- =====================================================
-     AUTH SCREEN
-===================================================== -->
-
+<!-- AUTH SCREEN -->
 <section id="authScreen" class="auth-screen">
-
   <div class="auth-glow"></div>
-
   <div class="auth-card">
-
     <div class="auth-brand">
       <div class="logo">🏠</div>
       <span>AutoLead AI</span>
     </div>
-
-    <h1 id="authTitle" class="auth-title">
-      Welcome back.
-    </h1>
-
-    <p id="authSub" class="auth-sub">
-      Real-estate sales intelligence for agents and teams.
-    </p>
+    <h1 id="authTitle" class="auth-title">Welcome back.</h1>
+    <p id="authSub" class="auth-sub">Real-estate sales intelligence for agents and teams.</p>
 
     <div id="nameField" class="field hidden">
       <label>FULL NAME</label>
-      <input
-        id="authName"
-        type="text"
-        autocomplete="name"
-        placeholder="Your name"
-      >
+      <input id="authName" type="text" autocomplete="name" placeholder="Your name">
     </div>
-
     <div class="field">
       <label>EMAIL</label>
-      <input
-        id="authEmail"
-        type="email"
-        autocomplete="email"
-        placeholder="you@example.com"
-      >
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
     </div>
-
     <div class="field">
       <label>PASSWORD</label>
-      <input
-        id="authPassword"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Minimum 8 characters"
-      >
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Minimum 8 characters">
     </div>
 
     <div id="forgotRow" class="auth-row">
-      <button id="forgotOpen" class="link">
-        Forgot password?
-      </button>
+      <button id="forgotOpen" class="link">Forgot password?</button>
     </div>
 
-    <button id="authSubmit" class="btn btn-primary btn-full">
-      Sign In
-    </button>
-
+    <button id="authSubmit" class="btn btn-primary btn-full">Sign In</button>
     <div id="authMessage" class="auth-message"></div>
-
-    <button id="authSwitch" class="btn btn-dark auth-switch">
-      Create Account
-    </button>
-
-    <div class="auth-note">
-      Authorized lead data only. Never put API keys or passwords into public
-      source code.
-    </div>
-
+    <button id="authSwitch" class="btn btn-dark auth-switch">Create Account</button>
+    <div class="auth-note">Authorized lead data only. Never put API keys or passwords into public source code.</div>
   </div>
-
 </section>
 
-<!-- =====================================================
-     APP SCREEN
-===================================================== -->
-
+<!-- APP SCREEN -->
 <section id="appScreen" class="app-screen hidden">
 
-<header class="topbar">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🏠</div>
+      <span>AutoLead AI</span>
+    </div>
+    <div class="top-actions">
+      <div id="healthBadge" class="health offline">
+        <span class="dot"></span> Connecting
+      </div>
+      <div id="userChip" class="user-chip"></div>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </div>
+  </header>
 
-  <div class="brand">
-    <div class="logo">🏠</div>
-    <span>AutoLead AI</span>
-  </div>
+  <main class="container">
 
-  <div class="top-actions">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="eyebrow">REAL ESTATE SALES INTELLIGENCE</div>
+        <h1>Convert your <span>authorized leads</span> into more opportunities.</h1>
+        <p>Manage real lead data, qualify prospects with Gemini, track pipeline stages and move conversations toward site visits and bookings.</p>
+      </div>
+      <div id="trialPill" class="trial-pill">Trial loading…</div>
+    </section>
 
-    <div id="healthBadge" class="health offline">
-      <span class="dot"></span>
-      Connecting
+    <!-- OFFER -->
+    <section class="offer">
+      <div class="offer-head">
+        <div>
+          <div class="offer-title">🚀 FIRST PURCHASE OFFER</div>
+          <div class="offer-sub">Introductory AutoLead AI Pro access</div>
+        </div>
+        <div class="offer-price">₹5,000</div>
+      </div>
+      <div id="trialStatus" class="offer-status">Checking trial…</div>
+      <button id="upgradeBtn" class="btn btn-primary" style="margin-top:8px">View Pro Plan</button>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-slot">
+      <div><strong>Sponsored placement</strong>Reserved advertising space</div>
     </div>
 
-    <div id="userChip" class="user-chip"></div>
+    <!-- STATS -->
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-num" id="statTotal">—</div>
+        <div class="stat-note">All imported leads</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Hot Leads</div>
+        <div class="stat-num" id="statHot">—</div>
+        <div class="stat-note">High intent buyers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Site Visits</div>
+        <div class="stat-num" id="statVisit">—</div>
+        <div class="stat-note">Scheduled or done</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Converted</div>
+        <div class="stat-num" id="statConverted">—</div>
+        <div class="stat-note">Deals closed</div>
+      </div>
+    </section>
 
-    <button id="logoutBtn" class="logout">
-      Logout
-    </button>
+    <!-- MAIN GRID -->
+    <div class="grid">
 
-  </div>
+      <!-- LEFT: LEADS -->
+      <div class="stack">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Your Leads</div>
+              <div class="card-sub">Authorized buyer pipeline — real data only</div>
+            </div>
+            <button class="btn btn-purple" id="csvBtn">📂 CSV Import</button>
+          </div>
 
-</header>
+          <div class="search-row">
+            <input id="searchInput" class="search" type="search" placeholder="🔍  Name, phone, email, location…">
+            <select id="filterStatus" class="select">
+              <option value="">All Stages</option>
+              <option>New</option>
+              <option>Qualified</option>
+              <option>Contacted</option>
+              <option>Interested</option>
+              <option>Site Visit</option>
+              <option>Negotiation</option>
+              <option>Booked</option>
+              <option>Converted</option>
+            </select>
+          </div>
 
-<main class="container">
-
-<section class="hero">
-
-  <div>
-
-    <div class="eyebrow">
-      REAL ESTATE SALES INTELLIGENCE
-    </div>
-
-    <h1>
-      Convert your
-      <span>authorized leads</span>
-      into more opportunities.
-    </h1>
-
-    <p>
-      Manage real lead data, qualify prospects with Gemini, track pipeline
-      stages and move conversations toward site visits and bookings.
-    </p>
-
-  </div>
-
-  <div id="trialPill" class="trial-pill">
-    Trial loading…
-  </div>
-
-</section>
-
-<!-- OFFER -->
-
-<section class="offer">
-
-  <div class="offer-head">
-
-    <div>
-      <div class="offer-title">
-        🚀 FIRST PURCHASE OFFER
+          <div id="leadsContainer" class="leads" style="margin-top:12px">
+            <div class="empty"><span class="empty-icon">⏳</span>Leads load ho rahe hain…</div>
+          </div>
+        </div>
       </div>
 
-      <div class="offer-sub">
-        Introductory AutoLead AI Pro access
+      <!-- RIGHT: TOOLS -->
+      <div class="stack">
+
+        <!-- PIPELINE -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Pipeline</div>
+              <div class="card-sub">Leads per stage</div>
+            </div>
+          </div>
+          <div class="pipeline">
+            <div class="pipe"><strong data-stage="New">0</strong><span>NEW</span></div>
+            <div class="pipe"><strong data-stage="Qualified">0</strong><span>QUALIFIED</span></div>
+            <div class="pipe"><strong data-stage="Contacted">0</strong><span>CONTACTED</span></div>
+            <div class="pipe"><strong data-stage="Interested">0</strong><span>INTERESTED</span></div>
+            <div class="pipe"><strong data-stage="Site Visit">0</strong><span>SITE VISIT</span></div>
+            <div class="pipe"><strong data-stage="Negotiation">0</strong><span>NEGOTIATION</span></div>
+            <div class="pipe"><strong data-stage="Booked">0</strong><span>BOOKED</span></div>
+            <div class="pipe"><strong data-stage="Converted">0</strong><span>CONVERTED</span></div>
+          </div>
+        </div>
+
+        <!-- LEAD SOURCES -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Lead Sources</div>
+              <div class="card-sub">Authorized integrations</div>
+            </div>
+          </div>
+          <div class="source">
+            <div>
+              <div class="source-title">CSV Import</div>
+              <div class="source-desc">Upload your authorized lead list</div>
+            </div>
+            <span class="badge badge-green">ACTIVE</span>
+          </div>
+          <div class="source">
+            <div>
+              <div class="source-title">Meta Lead Ads</div>
+              <div class="source-desc">Facebook / Instagram leads via webhook</div>
+            </div>
+            <span class="badge badge-yellow">COMING SOON</span>
+          </div>
+          <div class="source">
+            <div>
+              <div class="source-title">99acres / MagicBricks</div>
+              <div class="source-desc">Portal lead sync</div>
+            </div>
+            <span class="badge badge-yellow">COMING SOON</span>
+          </div>
+        </div>
+
+        <!-- CSV NOTICE -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:8px">📂 CSV Import Guide</div>
+          <div class="notice">
+            CSV mein yeh columns hone chahiye:<br><br>
+            <strong>name</strong> (required) · <strong>phone</strong> ya <strong>email</strong> (required)<br>
+            city · budget · property · segment<br><br>
+            Max file size: 2MB · Duplicates auto-skip hote hain
+          </div>
+          <button id="csvBtn2" class="btn btn-purple btn-full" style="margin-top:10px">📂 Upload CSV</button>
+        </div>
+
       </div>
     </div>
 
-    <div class="offer-price">
-      ₹5,000
+    <div class="footer">
+      AutoLead AI V4 · Authorized lead data only · Never fake leads, never fake scores
     </div>
 
-  </div>
-
-  <div id="trialStatus" class="offer-status">
-    Checking trial…
-  </div>
-
-  <button id="upgradeBtn" class="btn btn-primary" style="margin-top:8px">
-    View Pro Plan
-  </button>
-
+  </main>
 </section>
 
-<!-- AD -->
-
-<div class="ad-slot">
-  <div>
-    <strong>Sponsored placement</strong>
-    Reserved advertising space
+<!-- AI ANALYSIS MODAL -->
+<div id="aiModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="aiModalTitle">AI Analysis</div>
+      <button class="x btn" onclick="closeAIModal()">✕</button>
+    </div>
+    <pre id="aiBox" class="ai-box">⏳ Gemini se analysis aa rahi hai…</pre>
+    <div style="margin-top:10px;display:flex;gap:7px;">
+      <button class="btn btn-dark btn-full" onclick="closeAIModal()">Close</button>
+    </div>
   </div>
 </div>
 
-<!-- STATS -->
+<!-- TOAST -->
+<div id="toast"></div>
 
-<section class="stats">
+<!-- HIDDEN CSV INPUT -->
+<input type="file" id="csvFileInput" accept=".csv" style="display:none">
 
-  <div class="stat">
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const API       = 'https://autolead-ai-v4.onrender.com';
+const TOKEN_KEY = 'autolead_token';
+const USER_KEY  = 'autolead_user';
+
+// ── Helpers ─────────────────────────────────────────────────
+const $  = id  => document.getElementById(id);
+const qs = sel => document.querySelector(sel);
+const getToken   = ()  => localStorage.getItem(TOKEN_KEY);
+const saveToken  = t   => localStorage.setItem(TOKEN_KEY, t);
+const clearSession = () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); };
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` };
+}
+function esc(str) {
+  return String(str ?? '').replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function toast(msg, isErr = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (isErr ? ' error' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = ''; }, 3000);
+}
+
+// ── Ripple ───────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const r    = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+function setLoading(btn, on, text) {
+  btn.disabled  = on;
+  btn.innerHTML = on ? `<span class="spinner"></span>${text}` : text;
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+let isLogin = true;
+
+function showAuthScreen() {
+  $('authScreen').classList.remove('hidden');
+  $('appScreen').classList.add('hidden');
+}
+function showAppScreen(user) {
+  $('authScreen').classList.add('hidden');
+  $('appScreen').classList.remove('hidden');
+  $('userChip').textContent = user?.name || user?.email || '';
+  loadAll();
+}
+
+$('authSwitch').addEventListener('click', () => {
+  isLogin = !isLogin;
+  $('authTitle').textContent  = isLogin ? 'Welcome back.'    : 'Create account.';
+  $('authSub').textContent    = isLogin
+    ? 'Real-estate sales intelligence for agents and teams.'
+    : 'Start your 7-day free trial today.';
+  $('nameField').classList.toggle('hidden', isLogin);
+  $('forgotRow').classList.toggle('hidden', !isLogin);
+  $('authSubmit').textContent = isLogin ? 'Sign In'        : 'Create Account';
+  $('authSwitch').textContent = isLogin ? 'Create Account' : 'Sign In Instead';
+  $('authMessage').textContent = '';
+});
+
+$('authSubmit').addEventListener('click', async () => {
+  const email    = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  const name     = $('authName').value.trim();
+
+  if (!email || !password)        return toast('Email aur password dalo', true);
+  if (!isLogin && !name)          return toast('Apna naam dalo', true);
+  if (password.length < 8)        return toast('Password 8+ characters ka hona chahiye', true);
+
+  const btn   = $('authSubmit');
+  const label = isLogin ? 'Sign In' : 'Create Account';
+  setLoading(btn, true, isLogin ? 'Signing in…' : 'Creating account…');
+  $('authMessage').textContent = '';
+
+  try {
+    const res  = await fetch(API + (isLogin ? '/api/auth/login' : '/api/auth/signup'), {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(isLogin ? { email, password } : { name, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { $('authMessage').textContent = data.error || 'Kuch galat hua'; return; }
+    saveToken(data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    showAppScreen(data.user);
+  } catch {
+    $('authMessage').textContent = 'Server se connect nahi ho pa raha. Thodi der mein try karo.';
+  } finally {
+    setLoading(btn, false, label);
+  }
+});
+
+['authEmail','authPassword','authName'].forEach(id =>
+  $(id)?.addEventListener('keydown', e => { if (e.key==='Enter') $('authSubmit').click(); })
+);
+
+$('forgotOpen').addEventListener('click', async () => {
+  const email = $('authEmail').value.trim();
+  if (!email) return toast('Pehle email dalo', true);
+  const res  = await fetch(API + '/api/auth/forgot-password', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})
+  });
+  const data = await res.json();
+  toast(data.message || 'Reset link bhej diya!');
+});
+
+$('logoutBtn').addEventListener('click', () => {
+  clearSession();
+  showAuthScreen();
+  toast('Logout ho gaye ✅');
+});
+
+// ============================================================
+// HEALTH
+// ============================================================
+async function checkHealth() {
+  const badge = $('healthBadge');
+  try {
+    const data = await fetch(API + '/api/health').then(r => r.json());
+    if (data.status === 'healthy') {
+      badge.className = 'health';
+      badge.innerHTML = '<span class="dot"></span> Live';
+    } else throw 0;
+  } catch {
+    badge.className = 'health offline';
+    badge.innerHTML = '<span class="dot"></span> Offline';
+  }
+}
+
+// ============================================================
+// TRIAL
+// ============================================================
+async function loadTrial() {
+  try {
+    const res = await fetch(API + '/api/trial', { headers: authHeaders() });
+    if (!res.ok) return;
+    const d = await res.json();
+    $('trialPill').textContent = d.active
+      ? `Trial: ${d.daysLeft} din bache · ${d.leadsRemaining} leads left`
+      : 'Trial khatam — Pro le lo!';
+    $('trialStatus').textContent = d.active
+      ? `✅ Trial Active — ${d.leadsUsed}/${d.limits.leads} leads use kiye, ${d.daysLeft} din bache`
+      : `⚠️ Trial khatam ho gaya — Pro plan activate karo`;
+  } catch {}
+}
+
+// ============================================================
+// LEADS
+// ============================================================
+let allLeads = [];
+
+function updateStats(leads) {
+  $('statTotal').textContent     = leads.length;
+  $('statHot').textContent       = leads.filter(l => l.lead_temperature === 'Hot').length;
+  $('statVisit').textContent     = leads.filter(l => l.lead_status === 'Site Visit').length;
+  $('statConverted').textContent = leads.filter(l => l.lead_status === 'Converted').length;
+}
+
+function updatePipeline(leads) {
+  document.querySelectorAll('[data-stage]').forEach(el => {
+    el.textContent = leads.filter(l => l.lead_status === el.dataset.stage).length;
+  });
+}
+
+async function loadLeads() {
+  const box = $('leadsContainer');
+  box.innerHTML = '<div class="empty"><span class="empty-icon">⏳</span>Leads load ho rahe hain…</div>';
+  try {
+    const res = await fetch(API + '/api/leads', { headers: authHeaders() });
+    if (!res.ok) { box.innerHTML = '<div class="empty"><span class="empty-icon">❌</span>Leads load nahi ho sake</div>'; return; }
+    allLeads = await res.json();
+    renderLeads(allLeads);
+    updateStats(allLeads);
+    updatePipeline(allLeads);
+  } catch {
+    box.innerHTML = '<div class="empty"><span class="empty-icon">❌</span>Server se connect nahi ho pa raha</div>';
+  }
+}
+
+function renderLeads(leads) {
+  const box = $('leadsContainer');
+  if (!leads.length) { box.innerHTML = '<div class="empty"><span class="empty-icon">🔍</span>Koi lead nahi mili</div>'; return; }
+  box.innerHTML = leads.map(l => {
+    const name   = esc(l.name || '—');
+    const score  = l.lead_score ?? '?';
+    const temp   = l.lead_temperature || '';
+    const status = l.lead_status || 'New';
+    const loc    = esc(l.location || '');
+    const budget = esc(l.budget || '');
+    const phone  = esc(l.phone || '');
+    const email  = esc(l.email || '');
+    const req    = esc(l.property_requirement || '');
+    const icon   = temp==='Hot'?'🔥':temp==='Warm'?'☀️':temp==='Cold'?'❄️':'';
+    return `
+<div class="lead">
+  <div class="lead-top">
+    <div>
+      <div class="lead-name">${name}</div>
+      <div class="lead-line">${loc}${loc&&budget?' · ':''}${budget}</div>
+      ${temp?`<span class="temperature ${temp}">${icon} ${temp}</span>`:''}
+    </div>
+    <div class="score">${score}</div>
+  </div>
+  <div class="lead-meta-row">
+    ${phone?`<span class="mini">📞 ${phone}</span>`:''}
+    ${email?`<span class="mini">✉️ ${email}</span>`:''}
+    ${req?`<span class="mini">🏠 ${req}</span>`:''}
+    <span class="mini">📋 ${esc(status)}</span>
+  </div>
+  <div class="lead-actions">
+    ${phone?`<button class="btn btn-green" onclick="callLead('${phone}')">📞 Call</button>`:''}
+    ${phone?`<button class="btn btn-green" onclick="waLead('${phone}')">💬 WhatsApp</button>`:''}
+    ${email?`<button class="btn btn-blue" onclick="mailLead('${email}')">✉️ Email</button>`:''}
+    <button class="btn btn-purple" onclick="openAIModal(${l.id},'${name}')">🤖 AI</button>
+    <select class="select status-select" onchange="updateStatus(${l.id},this.value)">
+      ${['New','Qualified','Contacted','Interested','Site Visit','Negotiation','Booked','Converted']
+        .map(s=>`<option value="${s}"${status===s?' selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>
+</div>`;
+  }).join('');
+}
+
+// Contact
+function callLead(p) { window.open(`tel:${p}`); }
+function waLead(p)   { window.open(`https://wa.me/${p.replace(/\D/g,'')}`); }
+function mailLead(e) { window.open(`mailto:${e}`); }
+
+// Status update
+async function updateStatus(id, status) {
+  try {
+    const res = await fetch(`${API}/api/leads/${id}/status`, {
+      method:'PATCH', headers:authHeaders(), body:JSON.stringify({status})
+    });
+    if (res.ok) {
+      const l = allLeads.find(l => l.id === id);
+      if (l) l.lead_status = status;
+      updateStats(allLeads);
+      updatePipeline(allLeads);
+      toast(`Status: ${status} ✅`);
+    } else { toast('Status update nahi hua', true); }
+  } catch { toast('Connection error', true); }
+}
+
+// Search + Filter
+function applyFilters() {
+  const q   = $('searchInput').value.toLowerCase();
+  const stg = $('filterStatus').value;
+  renderLeads(allLeads.filter(l =>
+    (!q || (l.name||'').toLowerCase().includes(q) || (l.phone||'').includes(q) ||
+            (l.email||'').toLowerCase().includes(q) || (l.location||'').toLowerCase().includes(q)) &&
+    (!stg || l.lead_status === stg)
+  ));
+}
+$('searchInput').addEventListener('input', applyFilters);
+$('filterStatus').addEventListener('change', applyFilters);
+
+// ============================================================
+// AI MODAL
+// ============================================================
+function openAIModal(leadId, name) {
+  $('aiModal').classList.add('active');
+  $('aiModalTitle').textContent = `AI Analysis — ${name}`;
+  $('aiBox').textContent = '⏳ Gemini se analysis aa rahi hai…';
+  runAI(leadId);
+}
+function closeAIModal() { $('aiModal').classList.remove('active'); }
+
+$('aiModal').addEventListener('click', e => { if (e.target === $('aiModal')) closeAIModal(); });
+
+async function runAI(leadId) {
+  try {
+    const res  = await fetch(API + '/api/ai/analyze', {
+      method:'POST', headers:authHeaders(), body:JSON.stringify({leadId})
+    });
+    const data = await res.json();
+    if (!res.ok) { $('aiBox').textContent = data.error || 'AI analysis fail hua'; return; }
+    const a = data.analysis || {};
+    $('aiBox').textContent = [
+      `Score       : ${a.score ?? '—'}/100`,
+      `Temperature : ${a.temperature ?? '—'}`,
+      `Intent      : ${a.intent ?? '—'}`,
+      ``,
+      `Next Action : ${a.next_best_action ?? '—'}`,
+      `Follow-up   : ${a.follow_up_timing ?? '—'}`,
+      ``,
+      `WhatsApp Message:`,
+      a.whatsapp_message ?? '—',
+      ``,
+      `Missing Info: ${(a.missing_information||[]).join(', ')||'None'}`,
+      ``,
+      `Verification: ${a.verification_note ?? '—'}`
+    ].join('\n');
+    toast('AI analysis complete! ✅');
+    loadLeads();
+  } catch { $('aiBox').textContent = '❌ AI se connect nahi ho pa raha'; }
+}
+
+// ============================================================
+// CSV IMPORT
+// ============================================================
+async function handleCSV(file) {
+  if (!file) return;
+  const btn  = $('csvBtn');
+  const btn2 = $('csvBtn2');
+  const form = new FormData();
+  form.append('file', file);
+  if (btn)  setLoading(btn,  true, 'Importing…');
+  if (btn2) setLoading(btn2, true, 'Importing…');
+  try {
+    const res  = await fetch(API + '/api/leads/import', {
+      method:'POST', headers:{'Authorization':`Bearer ${getToken()}`}, body:form
+    });
+    const data = await res.json();
+    if (res.ok) { toast(`✅ ${data.imported} leads import hue! (${data.duplicates} duplicates skip)`); loadLeads(); }
+    else toast(data.error || 'CSV import fail', true);
+  } catch { toast('Import error', true); }
+  finally {
+    if (btn)  setLoading(btn,  false, '📂 CSV Import');
+    if (btn2) setLoading(btn2, false, '📂 Upload CSV');
+    $('csvFileInput').value = '';
+  }
+}
+
+$('csvBtn')?.addEventListener('click',  () => $('csvFileInput').click());
+$('csvBtn2')?.addEventListener('click', () => $('csvFileInput').click());
+$('csvFileInput').addEventListener('change', e => handleCSV(e.target.files[0]));
+
+// ============================================================
+// UPGRADE
+// ============================================================
+$('upgradeBtn').addEventListener('click', () => toast('Payment system jald aa raha hai!'));
+
+// ============================================================
+// LOAD ALL
+// ============================================================
+function loadAll() {
+  checkHealth();
+  loadTrial();
+  loadLeads();
+  clearInterval(window._ht);
+  window._ht = setInterval(checkHealth, 30000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function() {
+  const t = getToken();
+  if (t) { const u = JSON.parse(localStorage.getItem(USER_KEY)||'{}'); showAppScreen(u); }
+  else showAuthScreen();
+})();
+</script>
+</body>
+</html>
